@@ -1,0 +1,109 @@
+{
+  "projectType": "saas",
+  "projectName": "AutoLog",
+  "projectDescription": "Fleet management and asset tracking platform for managing vehicles, inventory, clients, and operations.",
+  "theme": "linden",
+  "primaryColor": "#1e40af",
+  "lightColor": "#3b82f6",
+  "darkColor": "#1e3a8a",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "features",
+              "quick-start"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/fleet-management",
+              "features/asset-tracking",
+              "features/client-management",
+              "features/reporting"
+            ]
+          },
+          {
+            "group": "User Guides",
+            "pages": [
+              "guides/authentication",
+              "guides/dashboard",
+              "guides/vehicle-operations",
+              "guides/inventory-management",
+              "guides/reservations",
+              "guides/search",
+              "guides/notifications"
+            ]
+          },
+          {
+            "group": "Administration",
+            "pages": [
+              "admin/user-management",
+              "admin/permissions",
+              "admin/settings",
+              "admin/locations"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/internationalization",
+              "advanced/theming",
+              "advanced/exports"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Support",
+        "groups": [
+          {
+            "group": "Help Center",
+            "pages": [
+              "support/faqs",
+              "support/tutorials",
+              "support/troubleshooting"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "support/changelog",
+              "support/system-status"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Fleet and vehicle management",
+    "Asset inventory tracking with warehouses (bodegas)",
+    "Client and site management",
+    "Vehicle reservations and usage logging",
+    "Comprehensive reporting and analytics",
+    "Multi-language support (ES/EN)",
+    "Role-based permissions",
+    "2FA authentication",
+    "QR code generation for assets",
+    "Export capabilities (Excel, PDF)"
+  ],
+  "publicApiSurface": [
+    "Dashboard with KPIs and charts",
+    "Vehicle tracking and registration",
+    "Asset inventory management",
+    "Client and site administration",
+    "Reservation system",
+    "User management",
+    "Reports generation",
+    "Settings and configuration",
+    "Help center",
+    "Notification system",
+    "Search functionality"
+  ]
+}
