@@ -1,0 +1,554 @@
+---
+title: 'Troubleshooting Guide'
+description: 'Solutions to common issues and problems in AutoLog'
+---
+
+# Troubleshooting Guide
+
+Find solutions to common issues you might encounter while using AutoLog. If you can't find a solution here, contact our support team.
+
+## Login and Authentication Issues
+
+### Cannot Log In
+
+**Problem**: Unable to access your AutoLog account.
+
+**Solutions**:
+
+1. **Verify your credentials**
+   - Double-check your email address for typos
+   - Ensure Caps Lock is off when entering password
+   - Try copying and pasting your password to avoid typing errors
+
+2. **Clear browser cache and cookies**
+   - Go to your browser settings
+   - Clear browsing data for the last hour
+   - Try logging in again
+
+3. **Reset your password**
+   - Click "Forgot Password" on the login page
+   - Check your email for the reset link
+   - Create a new password following the requirements
+
+4. **Check account status**
+   - Contact your administrator to verify your account is active
+   - Ensure your account hasn't been locked due to multiple failed attempts
+
+<Warning>
+  If you've exceeded the maximum number of login attempts, your account may be temporarily locked. Wait 15-30 minutes or contact your administrator.
+</Warning>
+
+---
+
+### Two-Factor Authentication Not Working
+
+**Problem**: 2FA code is not accepted or authenticator app issues.
+
+**Solutions**:
+
+1. **Verify time synchronization**
+   - 2FA codes are time-based
+   - Ensure your device's clock is set to automatic
+   - Sync your authenticator app's time settings
+
+2. **Use a fresh code**
+   - Wait for a new code to generate (they refresh every 30 seconds)
+   - Don't reuse old codes
+
+3. **Check for typos**
+   - Enter the 6-digit code carefully
+   - Avoid including spaces
+
+4. **Use backup codes**
+   - If you saved backup codes during 2FA setup, try using one
+   - Each backup code can only be used once
+
+5. **Contact administrator**
+   - If all else fails, your administrator can temporarily disable 2FA for your account
+   - You'll need to set it up again after logging in
+
+<Note>
+  2FA was introduced in v2.0.0. If you're having persistent issues, ensure your AutoLog instance is updated to the latest version.
+</Note>
+
+---
+
+### Session Expires Too Quickly
+
+**Problem**: Getting logged out frequently.
+
+**Solutions**:
+
+1. **Check session settings**
+   - Session duration is configured by your administrator
+   - Contact them to adjust timeout settings if needed
+
+2. **Browser issues**
+   - Ensure cookies are enabled in your browser
+   - Add AutoLog to your browser's allowed sites list
+   - Try a different browser
+
+3. **httpOnly cookie authentication**
+   - AutoLog uses secure httpOnly cookies (v1.3.0+)
+   - Some browser extensions may interfere with cookies
+   - Try disabling extensions temporarily
+
+4. **Multiple tabs**
+   - Logging out in one tab affects all tabs
+   - Use a single tab to avoid conflicts
+
+---
+
+## Permission and Access Errors
+
+### "Access Denied" or "Insufficient Permissions"
+
+**Problem**: Cannot access certain features or pages.
+
+**Solutions**:
+
+1. **Verify your role**
+   - Check with your administrator about your assigned role
+   - Different roles have different access levels
+
+2. **Clear browser cache**
+   - Permission changes may be cached
+   - Clear cache and refresh the page
+   - AutoLog adds timestamps to GET requests to prevent caching (v2.1.0)
+
+3. **Re-login**
+   - Log out and log back in
+   - This refreshes your permission tokens
+
+4. **Check for updates**
+   - Ask your administrator if permissions were recently changed
+   - Changes should take effect immediately
+
+<Note>
+  The permissions system was revamped in v2.1.0 with a new UserPermissionsDrawer interface and timestamp-based cache prevention.
+</Note>
+
+---
+
+### Cannot See Certain Vehicles or Assets
+
+**Problem**: Missing data that should be visible.
+
+**Solutions**:
+
+1. **Check filters**
+   - Clear all active filters
+   - Verify you're not filtering by status, location, or company
+   - Reset view to default settings
+
+2. **Verify assignments**
+   - Vehicles/assets may be assigned to different companies
+   - Check if you have permission to view all companies
+   - Ask administrator to verify data assignments
+
+3. **Search instead**
+   - Use the global search (Ctrl+K) to find specific items
+   - Search results show all accessible items regardless of current filters
+
+---
+
+## Data Entry and Editing Issues
+
+### Cannot Save Vehicle or Asset Changes
+
+**Problem**: Changes don't save when editing vehicles or assets.
+
+**Solutions**:
+
+1. **Update to latest version**
+   - A bug preventing save on Enter key press was fixed in v2.3.2
+   - Ensure you're running the latest version
+
+2. **Use correct save method**
+   - Try clicking the Save button instead of pressing Enter
+   - Ensure all required fields are filled
+   - Look for validation error messages
+
+3. **Check for error messages**
+   - Red text or borders indicate invalid fields
+   - Hover over error icons for details
+   - Fix validation issues before saving
+
+4. **Form submission in drawers**
+   - If using drawers (Sheet component), ensure onSubmit is enabled
+   - This was fixed in v1.2.1
+
+<Warning>
+  If you see "Enter" not working in edit modals, update to v2.3.2 or later where this bug was fixed.
+</Warning>
+
+---
+
+### Bulk Import Fails
+
+**Problem**: Asset or vehicle bulk import doesn't complete.
+
+**Solutions**:
+
+1. **Check file format**
+   - Use the provided template
+   - Ensure all required columns are present
+   - Verify data types match expectations (dates, numbers, etc.)
+
+2. **Reduce batch size**
+   - Large batches may time out
+   - Try importing in smaller chunks (500-1000 records at a time)
+   - As of v1.1.4, movements are processed sequentially to prevent failures
+
+3. **Validate data**
+   - Remove special characters that might cause issues
+   - Ensure no duplicate IDs or serial numbers
+   - Check for missing required fields
+
+4. **Check logs**
+   - Review error messages in the import results
+   - Fix indicated issues and retry
+
+---
+
+## Search and Filter Problems
+
+### Search Results Not Showing
+
+**Problem**: Search returns no results or incorrect results.
+
+**Solutions**:
+
+1. **Verify search syntax**
+   - Check for typos in search terms
+   - Try partial matches instead of full terms
+   - Search is case-insensitive
+
+2. **Clear filters**
+   - Active filters may be excluding results
+   - Reset all filters and try again
+
+3. **Check permissions**
+   - You can only search items you have permission to view
+   - Contact administrator if you should see more results
+
+4. **Update search index**
+   - If recently added items don't appear, wait a moment and retry
+   - Refresh the page to ensure latest data is loaded
+
+<Note>
+  The search view was updated in v1.1.2 with improved highlighting. Ensure you're using this version or later for the best search experience.
+</Note>
+
+---
+
+### Filters Not Working
+
+**Problem**: Applying filters doesn't change results.
+
+**Solutions**:
+
+1. **Check for filter bugs**
+   - Filter bugs in assets were fixed in v1.1.0
+   - Update to the latest version
+
+2. **Refresh the page**
+   - Filter state may be cached
+   - Do a hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
+
+3. **Apply filters in order**
+   - Apply one filter at a time to identify issues
+   - Some filter combinations may return empty results
+
+4. **Check data**
+   - Verify the data you're filtering for actually exists
+   - Try different filter values
+
+---
+
+## Performance and Loading Issues
+
+### Slow Page Loading
+
+**Problem**: Pages take a long time to load.
+
+**Solutions**:
+
+1. **Check internet connection**
+   - Verify you have stable internet
+   - Test connection speed
+   - Try switching networks
+
+2. **Reduce data loads**
+   - Use filters to limit results
+   - Adjust pagination to show fewer items per page
+   - Close unnecessary browser tabs
+
+3. **Clear browser cache**
+   - Accumulated cache can slow performance
+   - Clear cache and reload
+
+4. **Check system status**
+   - Visit the [System Status](system-status) page
+   - Verify all services are operational
+   - Check for ongoing maintenance
+
+---
+
+### Features Not Loading or Blank Screens
+
+**Problem**: Parts of the interface don't appear or show blank.
+
+**Solutions**:
+
+1. **Check browser compatibility**
+   - AutoLog works best on modern browsers (Chrome, Firefox, Safari, Edge)
+   - Update your browser to the latest version
+   - Try a different browser
+
+2. **Disable browser extensions**
+   - Ad blockers or privacy extensions may interfere
+   - Temporarily disable extensions
+   - Whitelist AutoLog domain
+
+3. **Check JavaScript**
+   - Ensure JavaScript is enabled
+   - Check browser console for errors (F12 > Console tab)
+   - Report any errors to support
+
+4. **Hard refresh**
+   - Force reload with Ctrl+Shift+R (Windows/Linux)
+   - Or Cmd+Shift+R (Mac)
+   - This clears cached resources
+
+---
+
+## Mobile-Specific Issues
+
+### Mobile Interface Not Responsive
+
+**Problem**: Layout doesn't adapt to mobile screen.
+
+**Solutions**:
+
+1. **Update the app**
+   - Mobile improvements were added in v1.1.1
+   - Ensure you're using the latest version
+   - Auto-closing sidebar was fixed in this version
+
+2. **Check viewport settings**
+   - Try rotating your device
+   - Zoom may affect layout - reset zoom to 100%
+
+3. **Clear mobile browser cache**
+   - Go to browser settings
+   - Clear site data for AutoLog
+   - Reload the page
+
+---
+
+### QR Code Scanner Not Working
+
+**Problem**: Cannot scan vehicle QR codes.
+
+**Solutions**:
+
+1. **Grant camera permissions**
+   - Browser needs camera access
+   - Check browser settings > Permissions
+   - Allow camera for AutoLog domain
+
+2. **Check lighting**
+   - Ensure adequate lighting for QR code
+   - Clean camera lens
+   - Hold camera steady
+
+3. **QR code quality**
+   - Ensure QR code is not damaged or faded
+   - Regenerate and reprint if necessary
+
+4. **Use alternative method**
+   - Manually enter vehicle ID
+   - Use search function to find vehicle
+
+---
+
+## Appearance and Display Issues
+
+### Theme Not Applying
+
+**Problem**: Appearance changes don't take effect.
+
+**Solutions**:
+
+1. **Save changes**
+   - Ensure you clicked Save after making theme changes
+   - Look for confirmation message
+
+2. **Check theme engine**
+   - Theme engine was overhauled in v2.1.0
+   - Update to latest version for instant CSS variable updates
+   - TailwindDarkSync should inject changes automatically
+
+3. **Clear cached styles**
+   - Hard refresh the page
+   - Clear browser cache
+   - Restart browser
+
+4. **Use live preview**
+   - Settings > Appearance has a PreviewPanel
+   - Use it to test before saving
+
+---
+
+### Icons or Images Not Displaying
+
+**Problem**: Missing icons or broken images.
+
+**Solutions**:
+
+1. **Check network**
+   - Slow connection may prevent asset loading
+   - Wait a moment and refresh
+
+2. **Clear cache**
+   - Cached images may be corrupted
+   - Clear cache and reload
+
+3. **Check content blocking**
+   - Some extensions block image loading
+   - Disable ad blockers temporarily
+
+---
+
+## Report Generation Issues
+
+### Reports Not Generating
+
+**Problem**: Report generation fails or times out.
+
+**Solutions**:
+
+1. **Reduce date range**
+   - Large date ranges take longer to process
+   - Try shorter periods
+   - Generate multiple smaller reports
+
+2. **Limit filters**
+   - Too many filters may cause timeouts
+   - Simplify filter criteria
+
+3. **Check permissions**
+   - Verify you have permission to generate reports
+   - Some report types may be restricted
+
+4. **Try different format**
+   - If PDF fails, try CSV or Excel
+   - Different formats have different resource requirements
+
+---
+
+### Report Data Seems Incorrect
+
+**Problem**: Report shows unexpected or missing data.
+
+**Solutions**:
+
+1. **Verify filter settings**
+   - Check all applied filters
+   - Ensure date ranges are correct
+   - Verify status filters are appropriate
+
+2. **Check data permissions**
+   - You may not have access to all data
+   - Reports only show data you're permitted to view
+
+3. **Confirm data exists**
+   - Verify the expected data is actually in the system
+   - Check individual records to confirm
+
+4. **Regenerate report**
+   - Data may have been updated
+   - Generate a fresh report
+
+---
+
+## System-Wide Issues
+
+### "Service Unavailable" or 500 Errors
+
+**Problem**: Error messages indicating system problems.
+
+**Solutions**:
+
+1. **Check system status**
+   - Visit [System Status](system-status) page
+   - Look for ongoing incidents or maintenance
+   - Services may be temporarily degraded
+
+2. **Wait and retry**
+   - Temporary outages usually resolve quickly
+   - Wait 5-10 minutes and try again
+
+3. **Contact support**
+   - If issue persists, report it immediately
+   - Include error messages and screenshots
+   - Mention what you were doing when error occurred
+
+<Warning>
+  If you see widespread errors, check the System Status page before contacting support - there may already be a known incident.
+</Warning>
+
+---
+
+### Data Not Syncing
+
+**Problem**: Changes not appearing or data seems outdated.
+
+**Solutions**:
+
+1. **Refresh the page**
+   - Browser may be showing cached data
+   - Do a hard refresh
+
+2. **Check connection**
+   - Verify stable internet connection
+   - Reconnect if disconnected
+
+3. **Verify save**
+   - Ensure changes were actually saved
+   - Look for save confirmation
+   - Check if data appears in other views
+
+4. **Clear cache**
+   - Browser cache may be stale
+   - Clear and reload
+
+---
+
+## Getting Additional Help
+
+If you've tried these solutions and still need help:
+
+### Contact Support
+
+- **Email**: micros.teh@tecnasadesk.com
+- **WhatsApp**: Available for urgent issues
+- **Hours**: Monday-Friday, 8:00 AM - 5:00 PM
+
+### When Contacting Support, Include:
+
+1. **Detailed description** of the issue
+2. **Steps to reproduce** the problem
+3. **Screenshots or screen recordings** if applicable
+4. **Browser and device** information
+5. **AutoLog version** (found in Settings > About)
+6. **Error messages** (exact text or screenshots)
+7. **What you've already tried** from this guide
+
+### Other Resources
+
+- [FAQs](faqs) - Quick answers to common questions
+- [Tutorials](tutorials) - Step-by-step guides
+- [Changelog](changelog) - Recent updates and bug fixes
+- [System Status](system-status) - Real-time service health

@@ -1,0 +1,470 @@
+---
+title: Data Export
+description: Export reports and data to Excel, PDF, and CSV formats
+icon: file-down
+---
+
+AutoLog provides powerful export capabilities for reports and data, supporting **Excel (XLSX)**, **PDF**, and **CSV** formats with extensive customization options.
+
+## Export Formats
+
+<CardGroup cols={3}>
+  <Card title="Excel (XLSX)" icon="file-spreadsheet">
+    Rich spreadsheets with formatting, colors, and frozen headers
+  </Card>
+  <Card title="PDF" icon="file-text">
+    Professional documents with logos, headers, and pagination
+  </Card>
+  <Card title="CSV" icon="file-down">
+    Plain text format compatible with any spreadsheet application
+  </Card>
+</CardGroup>
+
+## Export Dialog
+
+The `ExportDialog` component provides a unified interface for exporting data:
+
+```jsx
+import ExportDialog from "@/components/Exports/ExportDialog";
+
+function MyReport() {
+  const [exportOpen, setExportOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setExportOpen(true)}>
+        Export Data
+      </Button>
+
+      <ExportDialog
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        rows={data}
+        pageRows={currentPageData}
+        columns={columns}
+        defaultTitle="Vehicle Report"
+        defaultFilenameBase="vehicles"
+        defaultOrientation="landscape"
+      />
+    </>
+  );
+}
+```
+
+### ExportDialog Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `open` | `boolean` | Controls dialog visibility |
+| `onClose` | `function` | Callback when dialog closes |
+| `rows` | `array` | All data rows for export |
+| `pageRows` | `array` | Current page rows (for page-only export) |
+| `columns` | `array` | Column definitions |
+| `defaultTitle` | `string` | Report title (default: "Reporte") |
+| `defaultSheetName` | `string` | Excel sheet name (default: "Hoja1") |
+| `defaultFilenameBase` | `string` | Base filename (default: "export") |
+| `defaultOrientation` | `string` | Page orientation: "landscape" or "portrait" |
+| `logoUrl` | `string` | Logo image URL |
+
+## Column Configuration
+
+Define columns for export with labels and data accessors:
+
+```javascript
+const columns = [
+  {
+    label: "Vehicle ID",
+    key: "id",
+  },
+  {
+    label: "License Plate",
+    key: "plate",
+  },
+  {
+    label: "Total Kilometers",
+    key: "totalKm",
+    get: (row) => row.kilometers?.toFixed(2) || "0.00",
+  },
+  {
+    label: "Status",
+    key: "status",
+    get: (row) => row.isActive ? "Active" : "Inactive",
+  },
+];
+```
+
+<Note>
+Use the `get` function for computed or formatted values. If not provided, the value is read directly from `row[key]`.
+</Note>
+
+## Export Options
+
+The ExportDialog provides extensive customization:
+
+<Steps>
+  <Step title="General Settings">
+    - **Filename Base** - Custom filename prefix
+    - **Title** - Report title displayed in exports
+    - **Orientation** - Portrait or Landscape
+    - **Scope** - Export all data or current page only
+  </Step>
+  <Step title="Excel Settings">
+    - **Sheet Name** - Name of the Excel worksheet
+    - **Footer Color** - Hex color for footer bar
+    - **Include Generated Stamp** - Add timestamp to footer
+  </Step>
+  <Step title="Column Customization">
+    - **Enable/Disable** columns
+    - **Reorder** columns with up/down buttons
+    - **Format Type** - Text, Number, Currency, or Date
+    - **Alignment** - Left, Center, or Right
+    - **Edit Labels** - Customize column headers
+  </Step>
+</Steps>
+
+## Export Functions
+
+AutoLog uses three core export functions from `src/utils/exporters.js`:
+
+### CSV Export
+
+```javascript
+import { exportToCSV } from "@/utils/exporters";
+
+exportToCSV({
+  rows: data,
+  columns: columns,
+  filename: "report_20260303.csv",
+});
+```
+
+**Features:**
+- UTF-8 encoding with BOM (Excel compatible)
+- Automatic escaping of quotes and special characters
+- Newlines converted to spaces
+
+### Excel Export
+
+```javascript
+import { exportToXLSX } from "@/utils/exporters";
+
+await exportToXLSX({
+  rows: data,
+  columns: columns,
+  sheetName: "Fleet Report",
+  filename: "fleet_report.xlsx",
+  title: "Monthly Fleet Report",
+  orientation: "landscape",
+  logoUrl: "/logo.png",
+  footerBgHex: "#6fe6b1",
+  includeGeneratedStamp: true,
+});
+```
+
+**Features:**
+- Company logo in header
+- Frozen header row
+- Auto-fit column widths
+- Color-coded headers
+- Footer bar with timestamp
+- Auto-filter enabled
+- Cell sanitization
+
+<CodeGroup>
+
+```javascript Basic Excel Export
+await exportToXLSX({
+  rows: vehicles,
+  columns: [
+    { label: "Plate", key: "plate" },
+    { label: "Model", key: "model" },
+  ],
+  filename: "vehicles.xlsx",
+});
+```
+
+```javascript Advanced Excel Export
+await exportToXLSX({
+  rows: vehicles,
+  columns: columns,
+  sheetName: "Fleet Data",
+  filename: "fleet_report.xlsx",
+  title: "Q1 Fleet Report 2026",
+  orientation: "landscape",
+  logoUrl: "/company-logo.png",
+  footerBgHex: "#10b981",
+  footerHeight: 16,
+  footerSideMarginCols: 1,
+  includeGeneratedStamp: true,
+});
+```
+
+</CodeGroup>
+
+### PDF Export
+
+```javascript
+import { exportToPDF } from "@/utils/exporters";
+
+await exportToPDF({
+  title: "Fleet Report",
+  rows: data,
+  columns: columns,
+  filename: "fleet_report.pdf",
+  orientation: "landscape",
+  logoUrl: "/logo.png",
+  footerBgHex: "#6fe6b1",
+  includeGeneratedStamp: true,
+});
+```
+
+**Features:**
+- Company logo in header
+- Centered report title
+- Alternating row colors
+- Page numbers
+- Footer bar with timestamp
+- Auto-fit table to page width
+
+## Data Formatting
+
+The export system includes automatic data formatting:
+
+```javascript
+function formatValue(val, type = "text") {
+  if (val == null) return "";
+  
+  switch (type) {
+    case "number":
+      return new Intl.NumberFormat("es-HN").format(Number(val) || 0);
+    
+    case "currency":
+      return new Intl.NumberFormat("es-HN", {
+        style: "currency",
+        currency: "HNL",
+        maximumFractionDigits: 2,
+      }).format(Number(val) || 0);
+    
+    case "date":
+      const d = new Date(val);
+      return new Intl.DateTimeFormat("es-HN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(d);
+    
+    default:
+      return String(val);
+  }
+}
+```
+
+### Applying Formats
+
+Configure column formatting in the ExportDialog:
+
+<Steps>
+  <Step title="Text Format">
+    Default format, displays values as strings
+  </Step>
+  <Step title="Number Format">
+    Formats numbers with thousands separators (e.g., 1,234.56)
+  </Step>
+  <Step title="Currency Format">
+    Formats as Honduran Lempira (HNL) with currency symbol
+  </Step>
+  <Step title="Date Format">
+    Formats dates as DD/MM/YYYY in Honduran locale
+  </Step>
+</Steps>
+
+## File Naming
+
+Exported files automatically include timestamps:
+
+```javascript
+function fullFileName(ext) {
+  const now = new Date().toISOString().replace(/[-:]/g, "").slice(0, 15);
+  return `${fileNameBase || "export"}_${now}.${ext}`;
+}
+
+// Example outputs:
+// vehicles_20260303T142530.xlsx
+// fleet_report_20260303T142530.pdf
+// data_20260303T142530.csv
+```
+
+## Preview Panel
+
+The ExportDialog includes a live preview showing:
+
+- Company logo
+- Report title
+- First 5 rows of data
+- Selected columns with formatting applied
+- Footer color bar
+- Generated timestamp (if enabled)
+
+```jsx
+<Sheet variant="outlined" sx={{ p: 1 }}>
+  {/* Logo and Title */}
+  <Stack direction="row" alignItems="center" spacing={1}>
+    <img src={logo} alt="logo" style={{ width: 140 }} />
+    <Typography level="title-lg">{title}</Typography>
+  </Stack>
+  
+  {/* Timestamp */}
+  {includeGeneratedStamp && (
+    <Typography level="body-xs" color="neutral">
+      Generado: {new Date().toLocaleString("es-HN")}
+    </Typography>
+  )}
+  
+  {/* Data Preview */}
+  <Table>
+    <thead>
+      <tr>
+        {selectedCols.map(c => <th key={c.key}>{c.label}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {previewRows.map((row, i) => (
+        <tr key={i}>
+          {selectedCols.map(c => (
+            <td key={c.key}>{formatValue(row[c.key], c.type)}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </Table>
+  
+  {/* Footer Bar */}
+  <div style={{ height: 6, background: footerColor }} />
+</Sheet>
+```
+
+## Export Loading States
+
+The export system prevents double-clicks and shows loading indicators:
+
+```jsx
+const [busy, setBusy] = useState(null); // null | "csv" | "xlsx" | "pdf"
+
+const runBusy = async (type, fn) => {
+  if (busy) return; // Prevent double-click
+  try {
+    setBusy(type);
+    await fn();
+  } catch (e) {
+    console.error(`Export ${type} failed`, e);
+  } finally {
+    setBusy(null);
+  }
+};
+
+return (
+  <>
+    <Button
+      onClick={() => runBusy("pdf", doPDF)}
+      loading={busy === "pdf"}
+      disabled={!!busy}
+    >
+      Export PDF
+    </Button>
+    <Button
+      onClick={() => runBusy("xlsx", doXLSX)}
+      loading={busy === "xlsx"}
+      disabled={!!busy}
+    >
+      Export Excel
+    </Button>
+  </>
+);
+```
+
+## Dependencies
+
+The export system uses these libraries:
+
+- **ExcelJS** - Excel file generation with rich formatting
+- **jsPDF** - PDF document creation
+- **jspdf-autotable** - Automatic table generation in PDFs
+
+```json package.json
+{
+  "dependencies": {
+    "exceljs": "^4.x",
+    "jspdf": "^2.x",
+    "jspdf-autotable": "^3.x"
+  }
+}
+```
+
+<Tip>
+All export functions are asynchronous and dynamically import their dependencies to reduce initial bundle size.
+</Tip>
+
+## Example: Complete Export Implementation
+
+```jsx VehicleReport.jsx
+import { useState } from "react";
+import { Button } from "@mui/joy";
+import { FileDown } from "lucide-react";
+import ExportDialog from "@/components/Exports/ExportDialog";
+
+export default function VehicleReport() {
+  const [exportOpen, setExportOpen] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
+
+  const columns = [
+    { label: "Placa", key: "plate" },
+    { label: "Modelo", key: "model" },
+    { 
+      label: "Kilometraje", 
+      key: "kilometers",
+      get: (row) => row.kilometers?.toFixed(2) || "0.00"
+    },
+    { 
+      label: "Estado", 
+      key: "status",
+      get: (row) => row.isActive ? "Activo" : "Inactivo"
+    },
+  ];
+
+  return (
+    <>
+      <Button
+        startDecorator={<FileDown size={16} />}
+        onClick={() => setExportOpen(true)}
+      >
+        Exportar Datos
+      </Button>
+
+      <ExportDialog
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        rows={vehicles}
+        pageRows={vehicles.slice(0, 10)}
+        columns={columns}
+        defaultTitle="Reporte de Vehículos"
+        defaultFilenameBase="vehiculos"
+        defaultSheetName="Vehículos"
+        defaultOrientation="landscape"
+        logoUrl="/logo-tecnasa.png"
+      />
+    </>
+  );
+}
+```
+
+## Best Practices
+
+<Note>
+  - Always provide meaningful column labels
+  - Use the `get` function for computed values
+  - Test exports with large datasets (1000+ rows)
+  - Include company logo for professional reports
+  - Enable timestamp for audit trails
+  - Sanitize user input to prevent injection
+  - Provide loading states during export
+</Note>

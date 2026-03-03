@@ -1,0 +1,293 @@
+---
+title: User Management
+description: Manage system users, roles, and user accounts in AutoLog
+icon: users
+---
+
+The User Management interface provides comprehensive tools for creating, editing, and managing user accounts across your AutoLog system.
+
+## Overview
+
+User management is accessible from the Users page (`/Users/Users.jsx`). This interface allows administrators to:
+
+- Create and manage user accounts
+- Assign roles and positions
+- Configure user locations and supervisors
+- Control user access through activation/deactivation
+- Reset user passwords
+- Search and filter users
+
+## Permissions Required
+
+Access to user management features requires specific permissions:
+
+| Action | Permission |
+|--------|------------|
+| View users | `ver_usuarios` |
+| Create users | `crear_usuario` |
+| Edit users | `editar_usuario` |
+| Delete/deactivate users | `eliminar_usuario` |
+| Restore users | `restaurar_usuario` |
+| Assign permissions | Admin role or `asignar_permisos` |
+
+<Note>
+Users with the **Admin** role have access to all user management features by default.
+</Note>
+
+## Creating a New User
+
+To create a new user account:
+
+<Steps>
+  <Step title="Open User Form">
+    Click the **New User** button in the toolbar. This opens the user creation drawer.
+  </Step>
+  
+  <Step title="Enter Required Information">
+    Fill in the required fields:
+    
+    <ParamField path="nombre" type="string" required>
+      Full name of the user
+    </ParamField>
+    
+    <ParamField path="email" type="email" required>
+      User's email address (used for login and notifications)
+    </ParamField>
+    
+    <ParamField path="username" type="string" required>
+      Username for system login (minimum 3 characters)
+    </ParamField>
+  </Step>
+  
+  <Step title="Configure Optional Fields">
+    Set additional user attributes:
+    
+    <ParamField path="rol" type="select">
+      User role from the catalog (`rolesUsuario`). Examples: Admin, Manager, User
+    </ParamField>
+    
+    <ParamField path="puesto" type="select">
+      User position from the catalog (`puestosUsuario`)
+    </ParamField>
+    
+    <ParamField path="ciudad" type="autocomplete">
+      Select from available cities. Uses `id_ciudad` field.
+    </ParamField>
+    
+    <ParamField path="supervisor_id" type="autocomplete">
+      Assign a supervisor from the list of available supervisors
+    </ParamField>
+  </Step>
+  
+  <Step title="Password Generation">
+    The system automatically generates a secure password (12 characters) containing:
+    - Uppercase letters
+    - Lowercase letters
+    - Numbers
+    - Special characters (@#$%&*_-+!)
+    
+    This password is sent to the user's email via `sendMail` service.
+  </Step>
+  
+  <Step title="Save and Send Credentials">
+    Click **Save** to create the account. The user receives an email with:
+    - Username
+    - Generated password
+    - Welcome information
+  </Step>
+</Steps>
+
+<Warning>
+If email delivery fails, the user is still created, but a warning toast is shown. Make sure to manually provide credentials to the user.
+</Warning>
+
+## Editing Users
+
+To modify an existing user account:
+
+1. Click the **three-dot menu** on the user row
+2. Select **Edit** from the dropdown
+3. Modify any fields in the user form
+4. Click **Save** to apply changes
+
+<Note>
+When editing, the password field is not displayed or modified. Use the **Reset Password** function to change passwords.
+</Note>
+
+## User Actions
+
+### Reset Password
+
+To send a password reset email:
+
+1. Click the three-dot menu on the user row
+2. Select **Reset Password**
+3. Confirm the action
+4. System sends recovery email using `sendRecoveryPassword(email)`
+
+<Note>
+The user must have a valid email address for password reset to work.
+</Note>
+
+### Deactivate User
+
+To deactivate a user account:
+
+1. Click the three-dot menu on the user row
+2. Select **Deactivate**
+3. Confirm the action
+
+Deactivated users:
+- Cannot log into the system
+- Show `estatus: "Inactivo"` in the database
+- Remain in the system and can be restored
+- Are still visible when "Show Inactive" toggle is enabled
+
+### Restore User
+
+To restore a deactivated user:
+
+1. Enable the **Show Inactive** toggle
+2. Find the deactivated user (shown with neutral chip)
+3. Click the three-dot menu
+4. Select **Restore**
+5. Confirm the action
+
+The user's status changes to `Activo` and they can log in again.
+
+### Bulk Deactivate
+
+To deactivate multiple users at once:
+
+1. Check the boxes next to users you want to deactivate
+2. Click the **Deactivate Selected** button in the toolbar
+3. Confirm the bulk action
+
+All selected users are deactivated simultaneously using `Promise.all()`.
+
+## Searching and Filtering
+
+### Search Bar
+
+The search functionality filters users by:
+- Name (`nombre`)
+- Email
+- Username
+- Role (`rol`)
+- Position (`puesto`)
+- City (`ciudad`)
+
+Search uses normalized text matching (removes accents, case-insensitive).
+
+### Show Inactive Toggle
+
+By default, only active users are displayed. Enable the **Show Inactive** switch to view deactivated users.
+
+## User Status Display
+
+Users are displayed in a table with the following columns:
+
+| Column | Description |
+|--------|-------------|
+| Name | User's full name |
+| Username | Login username |
+| Email | Email address |
+| Role | Assigned role |
+| City | User's assigned city |
+| Status | Active (success chip) or Inactive (neutral chip) |
+| Actions | Dropdown menu with available actions |
+
+## Row Selection
+
+Users can be selected using checkboxes for bulk operations:
+- Click the header checkbox to select all visible users
+- Click individual checkboxes to select specific users
+- Selected count is displayed in the bulk action button
+
+## URL Parameters and Highlighting
+
+The user table supports focus highlighting via URL parameters:
+
+```
+/users?focus=<id_usuario>
+/users?focus=<username>
+```
+
+When a focus parameter is present:
+- The matching user row is highlighted with primary color background
+- The page scrolls to bring the user into view
+- Highlight lasts for 4 seconds
+- Search is cleared and inactive users are shown
+
+## Data Loading
+
+User data is loaded from three services in parallel:
+
+```javascript
+const [usersRes, ciudadesRes, supervisoresRes] = await Promise.all([
+  getUsersService(),
+  getCiudades(),
+  getUserSupervisors(),
+]);
+```
+
+This ensures fast page load times even with large datasets.
+
+## Error Handling
+
+The user management interface handles several error states:
+
+### Network Errors
+
+When the API is unreachable, users see:
+- Error icon with descriptive message
+- **Retry** button to reload data
+- Error detection using regex: `/failed to fetch|network/i`
+
+### Permission Errors
+
+Users without `ver_usuarios` permission see:
+- Lock icon with "No Permission" message
+- Message to contact administrator
+
+### Session Verification
+
+While verifying authentication session:
+- Loading spinner is displayed
+- "Verifying session" message shown
+
+## Best Practices
+
+<Note>
+**User Account Management**
+
+1. Always assign appropriate roles and permissions
+2. Use meaningful usernames (avoid generic names)
+3. Ensure email addresses are valid and monitored
+4. Regularly review inactive users
+5. Document reason for user deactivation (if needed)
+</Note>
+
+<Warning>
+**Security Considerations**
+
+- Never share generated passwords through insecure channels
+- Immediately deactivate accounts for departing employees
+- Regularly audit user permissions and roles
+- Use the bulk deactivate feature carefully (it cannot be undone in one action)
+</Warning>
+
+## Integration with Other Features
+
+User management integrates with:
+- **Permissions System**: Assign granular permissions via the Permissions drawer
+- **Email Service**: Automatic credential delivery and password reset
+- **Activity Logs**: User actions are tracked in security logs
+- **Cities & Locations**: User location assignment for reporting
+- **Supervisor Hierarchy**: Organizational structure management
+
+## Related Pages
+
+- [Permissions](admin/permissions) - Configure role-based access control
+- [Settings](admin/settings) - System configuration
+- [Locations](admin/locations) - Manage cities and countries

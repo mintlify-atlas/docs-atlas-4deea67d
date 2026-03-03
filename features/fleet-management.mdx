@@ -1,0 +1,385 @@
+---
+title: Fleet Management
+description: Comprehensive vehicle fleet management with QR codes, registration tracking, and reservations
+---
+
+AutoLog's Fleet Management module provides complete control over your vehicle fleet, from registration to reservations and real-time status tracking.
+
+## Overview
+
+The fleet management system allows you to:
+- Register and manage vehicle information
+- Generate QR codes for vehicle registration workflows
+- Track vehicle status and availability
+- Monitor vehicle usage and assignments
+- Manage vehicle reservations
+
+## Vehicle Registration
+
+### Adding a New Vehicle
+
+<Steps>
+  <Step title="Access Vehicle Management">
+    Navigate to **Vehículos** from the main navigation menu.
+  </Step>
+  
+  <Step title="Create Vehicle Record">
+    Click the **+ Agregar Vehículo** button in the toolbar.
+    
+    Fill in the required information:
+    - **Placa** (License plate)
+    - **Marca** (Make)
+    - **Modelo** (Model)
+    - **Ubicación Actual** (Current location)
+  </Step>
+  
+  <Step title="Save Vehicle">
+    Click **Guardar** to create the vehicle record. The system will:
+    - Validate the information
+    - Create the vehicle in the database
+    - Set initial status to "Disponible"
+  </Step>
+</Steps>
+
+<Note>
+The vehicle list automatically updates after adding a new vehicle. You can immediately generate QR codes or create reservations for the new vehicle.
+</Note>
+
+### Editing Vehicle Information
+
+To update vehicle details:
+
+1. Find the vehicle in the list using the search bar
+2. Click the **Edit** icon in the actions column
+3. Modify the necessary fields
+4. Click **Guardar** to save changes
+
+**API Service:** `actualizarVehiculo(id, vehiculo)` in `VehiculosService.jsx:84`
+
+## QR Code Generation
+
+AutoLog generates unique QR codes for each vehicle to streamline the check-out/check-in process.
+
+### Generating a Vehicle QR Code
+
+<Steps>
+  <Step title="Select Vehicle">
+    Locate the vehicle in the vehicle list.
+  </Step>
+  
+  <Step title="Generate QR">
+    Click the **QR** icon in the actions column. The system will:
+    - Generate a signed registration link
+    - Create a QR code with your company logo
+    - Display the QR code in a modal
+  </Step>
+  
+  <Step title="Download or Share">
+    Options available:
+    - **Descargar PNG**: Download the QR code as an image
+    - **Probar enlace**: Test the registration link
+    - Share the QR code for vehicle access
+  </Step>
+</Steps>
+
+### QR Code Registration Flow
+
+When an employee scans the QR code:
+
+```jsx
+// Source: VehiculosService.jsx:134-163
+export async function getRegistroLinkForVehiculo(idVehiculo) {
+  const res = await fetchConToken(
+    `${endpoints.getVehiculos}${idVehiculo}/registro/link`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  
+  // Returns: { url, token, expiresIn, vehiculo: { id, placa } }
+  return await res.json();
+}
+```
+
+<Accordion title="Understanding QR Token Security">
+  Each QR code contains a time-limited token that:
+  - Expires after a set period for security
+  - Is unique to each vehicle
+  - Can be resolved to vehicle information via `resolveVehiculoFromQrToken(token)`
+  - Prevents unauthorized vehicle access
+</Accordion>
+
+### In-Use Detection
+
+The system intelligently detects if a vehicle is already in use:
+
+<Tabs>
+  <Tab title="Vehicle Available">
+    When scanning a QR code for an available vehicle:
+    - Opens the registration form directly
+    - Pre-fills vehicle information
+    - Allows immediate check-out
+  </Tab>
+  
+  <Tab title="Vehicle In Use">
+    When a vehicle is already checked out:
+    - Shows who currently has the vehicle
+    - Displays check-out timestamp
+    - Offers to notify the current user
+    - Prevents duplicate registrations
+    
+    **Source:** `Vehiculos.jsx:302-466` implements the in-use detection logic
+  </Tab>
+  
+  <Tab title="Owner Returns">
+    If the current user scans their own vehicle QR:
+    - Automatically redirects to check-in form
+    - Pre-fills registration ID
+    - Streamlines the return process
+  </Tab>
+</Tabs>
+
+## Vehicle Status Management
+
+### Status Types
+
+Vehicles can have the following statuses:
+
+| Status | Description | Actions Available |
+|--------|-------------|------------------|
+| **Disponible** | Available for use | Reserve, Check-out, Edit |
+| **En Uso** | Currently checked out | View details, Notify user |
+| **En Mantenimiento** | Under maintenance | Edit, Update status |
+| **Inactivo** | Disabled/archived | Restore, View history |
+
+### Deactivating a Vehicle
+
+To temporarily disable a vehicle:
+
+<Warning>
+  Deactivating a vehicle will hide it from availability lists but preserve all historical data.
+</Warning>
+
+```jsx
+// Source: VehiculosService.jsx:102-114
+export async function deleteVehiculo(id) {
+  const res = await fetchConToken(endpoints.deleteVehiculo + id, {
+    method: "DELETE",
+  });
+  return await res.json();
+}
+```
+
+The UI confirms the action with SweetAlert:
+- **Title:** "¿Inhabilitar vehículo?"
+- **Action:** Changes status to "Inactivo"
+- **Result:** Vehicle removed from active lists
+
+### Restoring a Vehicle
+
+Reactivate a disabled vehicle:
+
+<Steps>
+  <Step title="Show Inactive Vehicles">
+    Toggle the **Mostrar Inactivos** filter in the toolbar
+  </Step>
+  
+  <Step title="Restore Vehicle">
+    Click the **Restore** icon on the inactive vehicle
+  </Step>
+  
+  <Step title="Confirm Restoration">
+    Confirm the action - vehicle returns to "Disponible" status
+  </Step>
+</Steps>
+
+## Vehicle Reservations
+
+The reservation system allows employees to book vehicles in advance.
+
+### Creating a Reservation
+
+<Tabs>
+  <Tab title="Employee Workflow">
+    1. Navigate to the reservations section
+    2. Select a vehicle from available options
+    3. Choose start and end dates/times
+    4. Add purpose/notes (optional)
+    5. Submit reservation
+    
+    The system validates:
+    - Vehicle availability
+    - Time slot conflicts
+    - Employee permissions
+  </Tab>
+  
+  <Tab title="Administrator Actions">
+    Administrators can:
+    - View all reservations
+    - Create reservations on behalf of employees
+    - Cancel or modify existing reservations
+    - Override conflicts when necessary
+  </Tab>
+</Tabs>
+
+### Reservation API Methods
+
+```jsx
+// Source: ReservaServices.jsx
+
+// Create new reservation
+export async function SaveReserva(reserva) {
+  const res = await fetchConToken(endpoints.Reservas, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(reserva),
+  });
+  return res.ok ? await res.json() : null;
+}
+
+// Cancel reservation
+export async function cancelarReserva(id) {
+  const res = await fetchConToken(
+    `${endpoints.Reservas}/cancelar/${id}`,
+    { method: "PUT" }
+  );
+  return res.ok ? await res.json() : null;
+}
+
+// Finalize reservation
+export async function finalizarReserva(id, body) {
+  const res = await fetchConToken(
+    `${endpoints.Reservas}/finalizar/${id}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }
+  );
+  return res.ok ? await res.json() : null;
+}
+```
+
+### Viewing Reservations
+
+Reservations can be viewed:
+- **By Vehicle:** See all bookings for a specific vehicle
+- **By Employee:** View an employee's upcoming/past reservations
+- **Calendar View:** Visual timeline of all reservations
+- **List View:** Filterable table of all reservations
+
+## Search and Filtering
+
+### Quick Search
+
+The search bar allows instant filtering by:
+- License plate (placa)
+- Make (marca)
+- Model (modelo)
+- Current location
+
+```jsx
+// Source: Vehiculos.jsx:474-488
+const filteredVehiculos = useMemo(() => {
+  const search = searchText.toLowerCase();
+  return (vehiculos || []).filter((u) => {
+    const matchesStatus = showInactive
+      ? true
+      : (u.estado || "").toLowerCase() !== "inactivo";
+    const matchesSearch = `${u.placa} ${u.marca} ${u.modelo} ${
+      u.nombre_ubicacion || ""
+    }`
+      .toLowerCase()
+      .includes(search);
+    return matchesStatus && matchesSearch;
+  });
+}, [vehiculos, showInactive, searchText]);
+```
+
+### Advanced Filters
+
+<CardGroup cols={2}>
+  <Card title="Status Filter" icon="filter">
+    Toggle between:
+    - Active vehicles only (default)
+    - Include inactive vehicles
+    - All statuses
+  </Card>
+  
+  <Card title="Location Filter" icon="map-pin">
+    Filter by:
+    - Current parking location
+    - Assigned department
+    - City/region
+  </Card>
+  
+  <Card title="Type Filter" icon="car">
+    Filter by vehicle type:
+    - Sedans
+    - Vans
+    - Trucks
+    - Special vehicles
+  </Card>
+  
+  <Card title="Usage Filter" icon="activity">
+    Filter by usage status:
+    - Available
+    - Currently in use
+    - Reserved
+    - In maintenance
+  </Card>
+</CardGroup>
+
+## Permissions
+
+Fleet management actions require specific permissions:
+
+| Action | Permission Required |
+|--------|--------------------|
+| View vehicles | `ver_vehiculos` |
+| Create vehicle | `crear_vehiculo` |
+| Edit vehicle | `editar_vehiculo` |
+| Delete/restore | `eliminar_vehiculo` / `gestionar_vehiculos` |
+| Generate QR | `crear_QR` |
+| Manage reservations | `gestionar_reservas` |
+
+**Permission Checking Example:**
+
+```jsx
+// Source: Vehiculos.jsx:74-78
+const canView = canAny("ver_vehiculos");
+const canCreate = canAny("crear_vehiculo");
+const canEdit = canAny("editar_vehiculo");
+const canDelete = canAny("eliminar_vehiculo");
+const canRestore = canAny("gestionar_vehiculos");
+```
+
+## Best Practices
+
+<Accordion title="QR Code Management">
+  - Print QR codes and attach to vehicle dashboards
+  - Laminate QR codes for durability
+  - Regenerate QR codes if compromised
+  - Store backup QR images in a secure location
+</Accordion>
+
+<Accordion title="Vehicle Tracking">
+  - Update vehicle status promptly
+  - Record maintenance dates and mileage
+  - Keep current location information accurate
+  - Review inactive vehicles quarterly
+</Accordion>
+
+<Accordion title="Reservation Management">
+  - Set clear reservation policies
+  - Send reminder notifications
+  - Handle no-shows consistently
+  - Track reservation compliance
+</Accordion>
+
+## Related Resources
+
+- [Asset Tracking](features/asset-tracking) - Track other equipment
+- [Reporting](features/reporting) - Vehicle usage reports
+- [Client Management](features/client-management) - Assign vehicles to clients

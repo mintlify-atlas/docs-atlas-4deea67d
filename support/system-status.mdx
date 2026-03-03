@@ -1,0 +1,424 @@
+---
+title: 'System Status'
+description: 'Real-time status of AutoLog services and system health'
+---
+
+# System Status
+
+Monitor the health and availability of AutoLog services in real-time.
+
+## Overview
+
+The AutoLog System Status page provides live monitoring of all critical services and infrastructure components. This page automatically refreshes to show current system health and any ongoing incidents.
+
+<Note>
+  The status page automatically refreshes every 60 seconds to provide the latest information.
+</Note>
+
+---
+
+## Understanding Service Status
+
+Each service in AutoLog can have one of the following statuses:
+
+### Operational (Green)
+
+- Service is functioning normally
+- All features available
+- No performance degradation
+- **Icon**: ✓ Checkmark
+
+### Degraded Performance (Yellow)
+
+- Service is available but may be slower than usual
+- Some features may have reduced functionality
+- System is working to restore full performance
+- **Icon**: ⚠ Warning
+
+### Scheduled Maintenance (Yellow)
+
+- Planned maintenance in progress
+- Service may be temporarily unavailable or limited
+- Expected completion time will be indicated
+- **Icon**: 🔧 Wrench
+
+### Service Outage (Red)
+
+- Service is currently unavailable
+- Team is actively working on resolution
+- Updates will be posted as available
+- **Icon**: ⛔ Error
+
+---
+
+## Service Components
+
+AutoLog monitors the following service groups:
+
+### Core Application Services
+
+**Web Application**
+- The main AutoLog web interface
+- User authentication and session management
+- Dashboard and navigation
+
+**API Services**
+- Backend API for all data operations
+- CRUD operations (Create, Read, Update, Delete)
+- Real-time data synchronization
+
+**Authentication Service**
+- Login and logout functionality
+- Two-factor authentication (2FA)
+- Session management
+- Password reset capabilities
+
+### Data Services
+
+**Database**
+- Primary data storage
+- Vehicle and asset records
+- User and permission data
+- Historical records and logs
+
+**File Storage**
+- QR code generation and storage
+- Document uploads
+- Report generation and storage
+- Image and media files
+
+**Search Service**
+- Global search functionality (Ctrl+K)
+- Asset and vehicle search
+- Full-text search across modules
+
+### Integration Services
+
+**Email Service**
+- Login alerts
+- Password reset emails
+- System notifications
+- Report delivery
+
+**WhatsApp Integration**
+- Customer support messaging
+- Notifications and alerts
+- Quick communication channel
+
+**Mobile API**
+- Mobile device access
+- QR code scanning
+- Mobile session management
+
+### Reporting & Analytics
+
+**Report Generation**
+- Usage reports
+- Inventory reports
+- Custom report creation
+- Export functionality (CSV, PDF, Excel)
+
+**Dashboard Analytics**
+- KPI calculations
+- Chart data processing
+- Real-time metrics
+
+---
+
+## Accessing System Status
+
+You can check system status in multiple ways:
+
+### 1. Within AutoLog
+
+1. Navigate to **Help** in the main menu
+2. Select **System Status**
+3. View current status of all services
+4. Services are grouped by category
+5. Each service shows:
+   - Current status (color-coded)
+   - Status message (if any)
+   - Last update time
+
+### 2. Status Page Features
+
+**Overall System Status**
+- Displayed at the top of the page
+- Shows aggregate health across all services
+- Possible states:
+  - "All Systems Operational" (green)
+  - "Some Services Degraded" (yellow)
+  - "Service Disruption" (red)
+  - "Scheduled Maintenance" (yellow)
+
+**Service Groups**
+- Services organized by functional area
+- Each group shows worst-case status of its services
+- Expandable cards with detailed service information
+
+**Summary Bar**
+- Quick counts of services by status:
+  - OK: Number of operational services
+  - Degraded/Maintenance: Services with issues or planned work
+  - Incident: Services currently down
+
+**Refresh Control**
+- Manual refresh button (↻) in the header
+- Shows last update timestamp
+- Indicates when next auto-refresh will occur
+
+---
+
+## During an Incident
+
+When a service incident occurs:
+
+### What You'll See
+
+1. **Affected Service Status Changes**
+   - Status indicator turns yellow or red
+   - Incident icon appears
+   - Descriptive message explains the issue
+
+2. **Incident Details**
+   - Brief description of the problem
+   - Affected functionality
+   - Estimated time to resolution (when available)
+   - Workarounds (if any)
+
+3. **Updates**
+   - Status messages updated as work progresses
+   - Timestamp shows when information was last updated
+
+### What To Do
+
+<Steps>
+  <Step title="Check Affected Services">
+    Identify which services are impacted by the incident. Not all AutoLog features may be affected.
+  </Step>
+  
+  <Step title="Review Incident Message">
+    Read the detailed message about the incident. It may include:
+    - What caused the issue
+    - What features are affected
+    - When resolution is expected
+    - Temporary workarounds
+  </Step>
+  
+  <Step title="Adjust Your Workflow">
+    If possible, use alternative features or wait for resolution:
+    - Use different report formats if generation is slow
+    - Defer non-critical operations
+    - Use cached data where available
+  </Step>
+  
+  <Step title="Monitor Status">
+    The page auto-refreshes every 60 seconds:
+    - Watch for status updates
+    - Look for resolution messages
+    - Check estimated completion times
+  </Step>
+  
+  <Step title="Contact Support If Needed">
+    If the incident prevents critical work:
+    - Email: micros.teh@tecnasadesk.com
+    - WhatsApp: For urgent issues
+    - Reference the specific service and incident time
+  </Step>
+</Steps>
+
+---
+
+## Planned Maintenance
+
+### Maintenance Windows
+
+AutoLog schedules maintenance during low-usage periods:
+
+- **Preferred Time**: After business hours (evenings, weekends)
+- **Duration**: Typically 1-4 hours
+- **Notification**: Announced at least 48 hours in advance
+
+### During Maintenance
+
+**What to Expect:**
+- Some services may be temporarily unavailable
+- Performance may be reduced
+- Ongoing operations should complete but new ones may be delayed
+- Login may be affected during auth service maintenance
+
+**Status Indicators:**
+- Services under maintenance show "Scheduled Maintenance" status
+- Yellow warning color
+- Expected completion time displayed
+- Progress updates as maintenance proceeds
+
+<Warning>
+  During major updates, AutoLog may be completely unavailable for 15-30 minutes. Plan accordingly and save your work before announced maintenance windows.
+</Warning>
+
+---
+
+## Status History
+
+The system maintains a log of status changes:
+
+### What's Recorded
+
+- Status transitions (operational → degraded → operational)
+- Incident start and end times
+- Maintenance windows
+- Performance metrics over time
+
+### Accessing History
+
+- Historical status data helps identify patterns
+- Useful for understanding recurring issues
+- Available to administrators for analysis
+
+---
+
+## Technical Details
+
+### How Status Monitoring Works
+
+AutoLog's status system uses the following architecture:
+
+**Service Health Checks**
+- Each service reports health status every 30-60 seconds
+- Automated health checks ping services continuously
+- Failed checks trigger automatic alerts
+
+**Status Aggregation**
+- Individual service statuses roll up to group status
+- Group statuses determine overall system status
+- "Worst case" logic: if any service is down, group shows incident
+
+**Real-time Updates**
+- Frontend polls status API every 60 seconds
+- Users see near-real-time status information
+- Manual refresh available for immediate updates
+
+**API Endpoints**
+
+The status system uses these service APIs:
+
+```
+GET /api/help/system-services
+  Returns: Array of service status objects
+
+GET /api/help/overall-status  
+  Returns: Overall system status object
+
+GET /api/help/status-history
+  Returns: Historical status log
+```
+
+---
+
+## Responding to Status Changes
+
+### If Core Services Are Down
+
+**Cannot Access AutoLog:**
+- Check system status from external source if available
+- Wait 5-10 minutes and retry
+- Clear browser cache and try again
+- Contact support if extended outage
+
+**Can Access But Features Don't Work:**
+- Check which services are affected
+- Avoid using impacted features temporarily
+- Use alternative workflows when possible
+- Save work frequently
+
+### If Optional Services Are Down
+
+**Search Not Working:**
+- Navigate directly to modules
+- Use filters instead of search
+- Browse lists to find items
+
+**Reports Not Generating:**
+- Try simpler report parameters
+- Reduce date ranges
+- Export data manually and process offline
+
+**Email Not Sending:**
+- Use alternative notification methods
+- Check status later for delayed emails
+- Contact users directly if urgent
+
+---
+
+## Best Practices
+
+<Note>
+  **Proactive Monitoring**
+  
+  - Check status before starting critical work
+  - Bookmark the system status page
+  - Subscribe to status notifications (if available)
+  - Plan around announced maintenance windows
+</Note>
+
+<Note>
+  **During Incidents**
+  
+  - Don't repeatedly retry failed operations - it may slow recovery
+  - Save work frequently
+  - Document what you were doing when the issue occurred
+  - Report new issues only if not already listed
+</Note>
+
+<Note>
+  **After Resolution**
+  
+  - Refresh your browser to clear any cached errors
+  - Log out and log back in if authentication was affected
+  - Retry previously failed operations
+  - Verify data integrity for interrupted work
+</Note>
+
+---
+
+## Status Definitions Reference
+
+| Status | Color | Meaning | Action Required |
+|--------|-------|---------|----------------|
+| **Operational** | Green | Service working normally | None - use as usual |
+| **Degraded Performance** | Yellow | Service slow or limited | Optional - may want to defer heavy operations |
+| **Maintenance** | Yellow | Planned work in progress | Review maintenance details, plan around it |
+| **Outage/Incident** | Red | Service unavailable | Wait for resolution or use workarounds |
+
+---
+
+## Need Help?
+
+If you have questions about system status:
+
+### Check These Resources First
+
+1. **Status page** - Most current information
+2. **Incident messages** - Detailed explanations
+3. **[Troubleshooting Guide](troubleshooting)** - Common solutions
+4. **[FAQs](faqs)** - General questions
+
+### Contact Support
+
+**When to contact:**
+- Issue not reflected on status page
+- Need clarification on incident impact
+- Require assistance with workarounds
+- Critical business need during outage
+
+**How to contact:**
+- **Email**: micros.teh@tecnasadesk.com
+- **WhatsApp**: For urgent issues
+- **Hours**: Monday-Friday, 8:00 AM - 5:00 PM
+
+**What to include:**
+- Screenshot of status page
+- Which service(s) are affected
+- What you were trying to do
+- Business impact of the issue

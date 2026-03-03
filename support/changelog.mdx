@@ -1,0 +1,462 @@
+---
+title: 'Changelog'
+description: 'Release history and version updates for AutoLog'
+---
+
+# Changelog
+
+Stay up-to-date with the latest features, improvements, and bug fixes in AutoLog.
+
+## v2.3.2 - December 17, 2025
+
+### Bug Fixes
+
+- Fixed bug where pressing Enter in the vehicle edit/create modal didn't save changes
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v2.3.1...v2.3.2)
+
+---
+
+## v2.3.1 - December 16, 2025
+
+### Features
+
+- Added comprehensive asset inventory list with advanced capabilities:
+  - Filtering by multiple criteria
+  - Column sorting (ascending/descending)
+  - Pagination for large datasets
+  - Full internationalization (i18n) support in Spanish and English
+- Introduced dedicated client assets page for better asset-client relationship management
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v2.3.0...v2.3.1)
+
+---
+
+## v2.3.0 - December 14, 2025
+
+### Features
+
+- **Complete redesign of Settings and Security module**
+  - Modern interface with improved navigation
+  - Enhanced security controls
+  - Better organization of configuration options
+  - Streamlined user experience
+
+### Improvements
+
+- Settings module restructured for easier access
+- Security settings consolidated in one place
+- Improved visual hierarchy and layout
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v2.2.0...v2.3.0)
+
+---
+
+## v2.2.0 - December 14, 2025
+
+### Major Features
+
+#### Global Internationalization (i18n) Rollout
+- Full Spanish (ES) and English (EN) language support across:
+  - Dashboard and Home page
+  - Settings module
+  - Users management
+  - Support/Help center
+  - All major UI components
+
+#### UI Modernization
+
+**Home Page**
+- Redesigned with live clock display
+- Modern, clean interface
+- Improved visual appeal
+
+**Dashboard Overhaul**
+- Real-time KPIs (Key Performance Indicators)
+- Interactive charts and graphs
+- Better data visualization
+- At-a-glance fleet insights
+
+**Drawer-Based UI**
+- Replaced modals with drawers in key modules:
+  - Vehicles management
+  - Assets/Inventory
+  - Companies
+  - Locations
+  - Cities and Countries
+  - FAQs and Tutorials
+- Improved user experience with side panels
+- Better form handling
+
+#### Enhanced Forms
+- New form validation using Yup schema validation
+- Implemented in:
+  - My Account (profile settings)
+  - Security settings
+- Better error messaging
+- Real-time validation feedback
+
+### Technical Improvements
+
+- Refactored SettingsContext for robust configuration management
+- Improved state management across the application
+- Enhanced performance and reliability
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v2.1.0...v2.2.0)
+
+---
+
+## v2.1.0 - December 11, 2025
+
+### Features
+
+#### Theme Engine Overhaul
+- Complete rewrite of theme system using `createAppTheme`
+- Instant CSS variable updates without page reload
+- Live PreviewPanel in Appearance settings
+- Real-time font application across the interface
+- Enhanced color customization
+
+#### TailwindDarkSync Enhancement
+- Injects RGB channels for transparency support
+- Seamless dark mode transitions
+- Better integration with Tailwind CSS
+
+#### Sidebar Improvements
+- Dynamic theme variable support for active NavItems
+- Improved visual feedback for current page
+- Better contrast and accessibility
+
+### Bug Fixes
+
+- Fixed session persistence issues in authentication
+- Resolved auth_token injection in API headers for mobile sessions
+- Fixed permissions page browser caching by adding timestamps to GET requests
+
+### UI Changes
+
+- Replaced Permissions page with cascading UserPermissionsDrawer
+- More intuitive permission management interface
+- Better visual hierarchy for permission settings
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v2.0.1...v2.1.0)
+
+---
+
+## v2.0.0 - December 8, 2025
+
+<Note>
+  **Major Version Release** - This release includes significant security enhancements and architectural changes.
+</Note>
+
+### Security Features
+
+#### Two-Factor Authentication (2FA)
+- Complete 2FA implementation flow
+- Authenticator app support (Google Authenticator, Authy, etc.)
+- Backup codes for account recovery
+- 2FA requirement handling in login flow
+
+#### Login Alerts
+- Email notifications for new device logins
+- Location tracking for login attempts
+- Security dashboard for monitoring account access
+- Suspicious activity detection
+
+### Features
+
+- **New Home Dashboard** replaces old Profile section
+  - Modern, informative landing page
+  - Quick access to key functions
+  - Personalized user experience
+
+### Technical Changes
+
+- Enhanced authentication flow
+- Improved security protocols
+- Better session management
+
+### Breaking Changes
+
+- Profile section moved to new Home dashboard
+- Authentication flow requires additional 2FA step when enabled
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.3.0...v2.0.0)
+
+---
+
+## v1.3.0 - December 1, 2025
+
+### Security Enhancement
+
+- **Authentication Refactor**: Replaced localStorage with httpOnly cookie-based authentication flow
+  - More secure credential storage
+  - Protection against XSS attacks
+  - Better session management
+  - Automatic session cleanup
+
+<Warning>
+  This change may require users to log in again after the update.
+</Warning>
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.2.1...v1.3.0)
+
+---
+
+## v1.2.1 - November 27, 2025
+
+### Bug Fixes
+
+- Fixed form submission in drawers (Sheet component)
+- Enabled proper `onSubmit` handling for drawer-based forms
+- Resolved issue where Save button didn't work in some drawer interfaces
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.2.0...v1.2.1)
+
+---
+
+## v1.2.0 - November 26, 2025
+
+### UI/UX Improvements
+
+- **Replaced modals with drawers** in main modules:
+  - Better use of screen space
+  - Improved workflow for data entry
+  - More modern interface design
+  - Enhanced mobile experience
+
+### Features
+
+- Added keyboard shortcuts for common actions
+- Improved navigation patterns
+- Better form accessibility
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.1.4...v1.2.0)
+
+---
+
+## v1.1.4 - November 23, 2025
+
+### Bug Fixes
+
+- **Asset movement processing optimization**:
+  - Changed to sequential processing (one at a time)
+  - Prevents failures with large batch operations
+  - Improved reliability for bulk movements
+  - Better error handling and reporting
+
+### Technical Changes
+
+- Updated WhatsApp chatbot test number
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.1.3...v1.1.4)
+
+---
+
+## v1.1.3 - November 21, 2025
+
+### Features
+
+- Added **"Backup"** status to asset status options (`ESTATUS_ACTIVO`)
+  - Track assets designated as backups
+  - Better inventory management
+  - Clearer asset purpose designation
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.1.2...v1.1.3)
+
+---
+
+## v1.1.2 - November 20, 2025
+
+### Features
+
+#### Session Management
+- Modified login flow to redirect to home page for both public and private sessions
+- Improved user experience with consistent navigation
+
+#### Vehicle QR Codes
+- Each vehicle now has a unique QR code
+- Scan QR codes to register vehicle usage
+- Quick access to vehicle information via QR
+- Improved mobile workflow for fleet operations
+
+#### Global Search Enhancement
+- Updated search interface (Ctrl+K)
+- Improved search result highlighting
+- Better visual feedback for matches
+- More intuitive navigation
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.1.1...v1.1.2)
+
+---
+
+## v1.1.1 - November 19, 2025
+
+### Features
+
+#### User Management
+- Added password reset button in Users view
+- Administrators can quickly reset user passwords
+- Improved user account management
+
+#### Mobile Improvements
+- Sidebar now auto-closes after navigation on mobile devices
+- Better mobile user experience
+- Reduced need for manual sidebar management
+
+#### Public Asset View
+- Updated public page for asset information display
+- Better presentation of asset data
+- Improved accessibility for public viewers
+
+#### UI Updates
+- Refreshed views for:
+  - Sites management
+  - Client assets
+  - Companies
+- Modern design language
+- Improved data visualization
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.1.0...v1.1.1)
+
+---
+
+## v1.1.0 - November 18, 2025
+
+### Features
+
+#### Enhanced Site and Location Management
+- Updated views for sites, assets, clients, and history
+- New fields for better location tracking
+- Improved relationship between assets and locations
+- Better client site management
+
+#### Inventory and Movement Tracking (Kardex)
+- Complete Kardex system implementation
+- Track asset movements between locations
+- Historical movement records
+- Better inventory control
+
+### Bug Fixes
+
+- Fixed multiple filter bugs in assets module
+- Resolved autocomplete issues in various forms
+- Improved site selection in modal dialogs
+- Added description field to asset assignment
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.0.1...v1.1.0)
+
+---
+
+## v1.0.1 - November 7, 2025
+
+### Visual Updates
+
+- Updated logo and branding
+- Adjusted login page text and styling
+- Updated index.html metadata
+
+### Documentation
+
+- Added commit template for consistent version control
+- Improved release process documentation
+
+### Links
+
+- [GitHub Comparison](https://github.com/khernan14/AutoLog/compare/v1.0.0...v1.0.1)
+
+---
+
+## v1.0.0 - November 6, 2025
+
+<Note>
+  **Initial Production Release** - First stable version of AutoLog
+</Note>
+
+### Features
+
+#### Inventory Management
+- New client details tab with visual and functional improvements
+- Better data presentation
+- Enhanced client-asset relationships
+
+#### Bulk Import
+- First iteration of mass asset import
+- Streamlined data entry for large inventories
+- CSV/Excel file support
+
+### UI Improvements
+
+- Migrated footer sidebar context menu to shadcn components
+- More consistent UI component library
+- Better design system implementation
+
+### Technical
+
+- **Tailwind v4 Configuration**
+  - Updated build process
+  - Vite plugin integration
+  - Compatibility fixes for various versions
+  - Organized and cleaned up styles
+
+### Links
+
+- [Full Changelog](https://github.com/khernan14/AutoLog/compare/prod-2025-11-04...v1.0.0)
+
+---
+
+## Version Naming Convention
+
+AutoLog follows [Semantic Versioning](https://semver.org/):
+
+- **Major version** (X.0.0): Breaking changes or significant architectural updates
+- **Minor version** (0.X.0): New features, non-breaking changes
+- **Patch version** (0.0.X): Bug fixes and small improvements
+
+---
+
+## Stay Updated
+
+To get notified about new releases:
+
+1. Watch the [AutoLog GitHub repository](https://github.com/khernan14/AutoLog)
+2. Check this changelog regularly
+3. Subscribe to release notifications in your profile settings
+4. Follow updates in the Help Center
+
+## Need Help?
+
+For questions about any release:
+
+- Review [FAQs](faqs) for feature explanations
+- Check [Tutorials](tutorials) for new feature guides
+- Visit [Troubleshooting](troubleshooting) for issue resolution
+- Contact support at micros.teh@tecnasadesk.com

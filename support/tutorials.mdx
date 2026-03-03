@@ -1,0 +1,474 @@
+---
+title: 'Tutorials & Guides'
+description: 'Step-by-step tutorials for getting started with AutoLog and mastering fleet management'
+---
+
+# Tutorials & Guides
+
+Learn how to use AutoLog effectively with these step-by-step tutorials covering common tasks and workflows.
+
+## Getting Started
+
+### Initial Setup and Configuration
+
+<Steps>
+  <Step title="Create Your Account">
+    If you're a new user, your administrator will create your account and send you login credentials via email.
+    
+    When you first log in:
+    1. Navigate to the login page
+    2. Enter your email and password
+    3. You'll be redirected to the home dashboard
+    4. Update your password in Settings > Security
+  </Step>
+  
+  <Step title="Enable Two-Factor Authentication">
+    Secure your account with 2FA:
+    1. Go to Settings > Security
+    2. Click "Enable Two-Factor Authentication"
+    3. Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.)
+    4. Enter the verification code to confirm
+    5. Save your backup codes in a secure location
+    
+    <Note>
+      2FA was introduced in v2.0.0 and is highly recommended for all users.
+    </Note>
+  </Step>
+  
+  <Step title="Customize Your Profile">
+    Personalize your AutoLog experience:
+    1. Navigate to Settings > Account
+    2. Update your profile information (name, email, phone)
+    3. Choose your preferred language (Spanish/English)
+    4. Set your timezone for accurate timestamps
+    5. Save your changes
+  </Step>
+  
+  <Step title="Configure Appearance Settings">
+    Customize the look and feel:
+    1. Go to Settings > Appearance
+    2. Choose between light and dark mode
+    3. Select your preferred color scheme
+    4. Adjust font settings if desired
+    5. Use the live preview panel to see changes
+    6. Save your preferences
+    
+    <Note>
+      The theme engine was overhauled in v2.1.0 with instant CSS variable updates.
+    </Note>
+  </Step>
+</Steps>
+
+---
+
+## Vehicle Management
+
+### Adding and Managing Vehicles
+
+<Steps>
+  <Step title="Access the Vehicles Module">
+    From the main navigation:
+    1. Click on "Vehicles" in the sidebar
+    2. You'll see a list of all vehicles in your fleet
+    3. Use filters to narrow down the view if needed
+  </Step>
+  
+  <Step title="Create a New Vehicle">
+    To add a vehicle to your fleet:
+    1. Click the "Add Vehicle" button (usually in the top-right)
+    2. The vehicle drawer will open on the right side
+    3. Fill in the required fields:
+       - Vehicle name/identifier
+       - Make and model
+       - Year
+       - VIN (Vehicle Identification Number)
+       - License plate
+       - Color
+       - Status (Active, Maintenance, etc.)
+    4. Optionally assign to a company or location
+    5. Add any additional notes or specifications
+    6. Press Enter or click Save to create the vehicle
+    
+    <Warning>
+      Make sure you're using AutoLog v2.3.2 or later - a bug that prevented saving when pressing Enter in the modal was fixed in this version.
+    </Warning>
+  </Step>
+  
+  <Step title="Generate and Use Vehicle QR Codes">
+    Each vehicle automatically gets a unique QR code:
+    1. Open the vehicle detail page
+    2. Find the QR code section
+    3. Click "Download" or "Print" to get a physical copy
+    4. Attach the QR code inside the vehicle (dashboard, sun visor, etc.)
+    
+    Drivers can scan this QR code to:
+    - Log vehicle usage
+    - Report issues
+    - Access vehicle information
+    - Check in/check out
+  </Step>
+  
+  <Step title="Edit Vehicle Information">
+    To update vehicle details:
+    1. Find the vehicle in the list
+    2. Click the edit icon or vehicle name
+    3. The vehicle drawer opens with current information
+    4. Modify any fields as needed
+    5. Save your changes
+    
+    All changes are logged with timestamps and user information.
+  </Step>
+  
+  <Step title="Track Vehicle Usage">
+    Monitor how your vehicles are being used:
+    1. Open the vehicle detail page
+    2. Navigate to the "Usage" tab
+    3. View usage logs, including:
+       - Driver information
+       - Check-in/check-out times
+       - Odometer readings
+       - Fuel consumption
+       - Trip purposes
+    4. Export usage data for reporting
+  </Step>
+</Steps>
+
+---
+
+## Asset Inventory Management
+
+### Managing Your Asset Inventory
+
+<Steps>
+  <Step title="Navigate to Asset Inventory">
+    Access the asset inventory system:
+    1. Click "Assets" or "Inventory" in the main navigation
+    2. You'll see the complete asset list with filtering options
+    3. The interface supports pagination for large inventories
+    
+    <Note>
+      The asset inventory list with advanced filtering was introduced in v2.3.1.
+    </Note>
+  </Step>
+  
+  <Step title="Add Individual Assets">
+    To add a single asset:
+    1. Click "Add Asset" button
+    2. Fill in asset details:
+       - Asset name/identifier
+       - Category or type
+       - Serial number
+       - Status (Active, In Transit, Maintenance, Backup)
+       - Purchase date and cost
+       - Warranty information
+    3. Assign to a location or company
+    4. Save the asset
+  </Step>
+  
+  <Step title="Import Assets in Bulk">
+    For large inventories, use bulk import:
+    1. Navigate to Assets > Import
+    2. Download the template file
+    3. Fill in your asset data following the template format
+    4. Upload your completed file
+    5. Review the preview of assets to be imported
+    6. Confirm the import
+    
+    <Warning>
+      Asset movements are processed sequentially (v1.1.4) to prevent failures with large batches. Large imports may take a few minutes.
+    </Warning>
+  </Step>
+  
+  <Step title="Filter and Search Assets">
+    Find assets quickly:
+    1. Use the search box to find assets by name or serial number
+    2. Apply filters:
+       - Status (Active, Maintenance, etc.)
+       - Location or site
+       - Company
+       - Date ranges
+    3. Sort by any column (click column headers)
+    4. Adjust pagination settings to show more/fewer items per page
+    
+    <Note>
+      A bug affecting asset filters was fixed in v1.1.0 - make sure you're on the latest version.
+    </Note>
+  </Step>
+  
+  <Step title="Assign Assets to Clients">
+    To assign assets to client sites:
+    1. Open the asset detail drawer
+    2. Find the "Assignment" section
+    3. Select the client from the dropdown
+    4. Choose the specific site/location
+    5. Add a description of the deployment
+    6. Save the assignment
+    
+    View all client assignments in the "Client Assets" page for a visual overview.
+  </Step>
+</Steps>
+
+---
+
+## Location and Movement Tracking
+
+### Managing Asset Movements
+
+<Steps>
+  <Step title="Create Location Records">
+    Set up your locations:
+    1. Navigate to Settings > Locations
+    2. Add internal locations (warehouses, offices)
+    3. Add client sites where assets are deployed
+    4. Include address information for accurate tracking
+    5. Organize locations by city and country
+  </Step>
+  
+  <Step title="Record Asset Movements">
+    Track when assets move between locations:
+    1. Select the asset you want to move
+    2. Click "Record Movement"
+    3. Specify:
+       - Origin location
+       - Destination location
+       - Movement date/time
+       - Reason for movement
+       - Quantity (for bulk items)
+    4. Confirm the movement
+    
+    All movements are logged in the Kardex history.
+  </Step>
+  
+  <Step title="View Movement History">
+    Check the complete movement history:
+    1. Go to Assets > History or the Kardex view
+    2. See all movements with:
+       - Timestamps
+       - Origin and destination
+       - User who performed the movement
+       - Current and previous locations
+    3. Filter by date range, asset, or location
+    4. Export history for reporting
+  </Step>
+</Steps>
+
+---
+
+## Reporting and Analytics
+
+### Generating Reports
+
+<Steps>
+  <Step title="Access the Reports Module">
+    Navigate to the Reports section:
+    1. Click "Reports" in the main menu
+    2. Choose the type of report you want to generate
+    3. Available report types:
+       - Vehicle usage reports
+       - Asset inventory reports
+       - Movement history
+       - Client assignment reports
+  </Step>
+  
+  <Step title="Configure Report Parameters">
+    Customize your report:
+    1. Select the date range
+    2. Choose which vehicles/assets to include
+    3. Apply filters (status, location, company, etc.)
+    4. Select grouping options
+    5. Choose sorting preferences
+  </Step>
+  
+  <Step title="Generate and Export">
+    Create and save your report:
+    1. Click "Generate Report"
+    2. Review the results on screen
+    3. Use the Export button to download
+    4. Choose your preferred format (CSV, PDF, Excel)
+    5. Save or share the report
+  </Step>
+  
+  <Step title="View Dashboard KPIs">
+    Monitor key metrics on the dashboard:
+    1. Navigate to the Dashboard (Home)
+    2. View live KPIs and charts (redesigned in v2.2.0)
+    3. See at-a-glance:
+       - Total vehicles and assets
+       - Active vs. inactive counts
+       - Recent movements
+       - Upcoming maintenance
+    4. Click any KPI for detailed drill-down
+  </Step>
+</Steps>
+
+---
+
+## User and Permission Management
+
+### Managing Team Access
+
+<Steps>
+  <Step title="Add New Users">
+    Grant access to team members:
+    1. Navigate to Settings > Users
+    2. Click "Add User"
+    3. Enter user details:
+       - Full name
+       - Email address
+       - Role (Admin, Manager, User)
+       - Initial password
+    4. Save the user
+    5. The user receives an email with login instructions
+  </Step>
+  
+  <Step title="Configure User Permissions">
+    Set granular access controls:
+    1. Select a user from the Users list
+    2. Click "Permissions" to open the User Permissions Drawer
+    3. Configure access for each module:
+       - Vehicles (View, Create, Edit, Delete)
+       - Assets (View, Create, Edit, Delete)
+       - Reports (View, Export)
+       - Settings (Access, Modify)
+       - Users (View, Manage)
+    4. Save permission changes
+    
+    <Note>
+      The permissions UI was revamped in v2.1.0 with a cascading drawer interface.
+    </Note>
+  </Step>
+  
+  <Step title="Reset User Passwords">
+    Help users regain access:
+    1. Go to Settings > Users
+    2. Find the user who needs a password reset
+    3. Click the "Reset Password" button (added in v1.1.1)
+    4. Choose to:
+       - Send a reset email to the user, or
+       - Set a temporary password manually
+    5. Notify the user of the reset
+  </Step>
+</Steps>
+
+---
+
+## Advanced Features
+
+### Using the Global Search
+
+<Steps>
+  <Step title="Open Quick Search">
+    Access search from anywhere:
+    1. Press **Ctrl+K** (Windows/Linux) or **Cmd+K** (Mac)
+    2. The search overlay appears
+    3. Start typing to search across all modules
+  </Step>
+  
+  <Step title="Search and Navigate">
+    Find what you need quickly:
+    1. Enter search terms (vehicle name, asset ID, location, etc.)
+    2. Results appear as you type, highlighting matches
+    3. Use arrow keys to navigate results
+    4. Press Enter to open the selected item
+    5. Press Esc to close the search
+    
+    <Note>
+      The search view was updated in v1.1.2 with improved result highlighting.
+    </Note>
+  </Step>
+</Steps>
+
+### Customizing the Interface
+
+<Steps>
+  <Step title="Choose Your Theme">
+    Personalize AutoLog's appearance:
+    1. Go to Settings > Appearance
+    2. Select between Light and Dark mode
+    3. The interface updates instantly with TailwindDarkSync (v2.1.0)
+    4. Changes sync across all open tabs
+  </Step>
+  
+  <Step title="Use the Preview Panel">
+    See changes before applying:
+    1. In Appearance settings, make theme adjustments
+    2. The live PreviewPanel shows changes in real-time
+    3. Experiment with different combinations
+    4. Save when you're satisfied with the look
+  </Step>
+</Steps>
+
+---
+
+## Mobile Usage
+
+### Using AutoLog on Mobile Devices
+
+<Steps>
+  <Step title="Access from Mobile Browser">
+    Use AutoLog on the go:
+    1. Open your mobile browser
+    2. Navigate to your AutoLog URL
+    3. Log in with your credentials
+    4. The mobile-optimized interface loads automatically
+    5. The sidebar auto-closes after navigation (v1.1.1)
+  </Step>
+  
+  <Step title="Scan Vehicle QR Codes">
+    Quick access via QR scanning:
+    1. Open AutoLog on your mobile device
+    2. Navigate to the QR scanner (or use your camera app)
+    3. Scan the QR code on the vehicle
+    4. You're taken directly to the vehicle page
+    5. Log usage or view information
+  </Step>
+  
+  <Step title="Log Vehicle Usage on Mobile">
+    Record usage from the field:
+    1. Scan vehicle QR code or search for the vehicle
+    2. Tap "Log Usage"
+    3. Enter usage details:
+       - Start/end times
+       - Odometer reading
+       - Fuel level
+       - Trip purpose
+    4. Submit the usage log
+  </Step>
+</Steps>
+
+---
+
+## Tips for Power Users
+
+<Note>
+  **Keyboard Shortcuts**
+  - **Ctrl+K / Cmd+K**: Open global search
+  - **Esc**: Close modals and drawers
+  - **Enter**: Save forms in drawers
+</Note>
+
+<Note>
+  **Efficient Data Entry**
+  - Use bulk import for large datasets
+  - Copy QR codes for quick vehicle access
+  - Set up keyboard shortcuts for common tasks
+  - Use filters to narrow down large lists before editing
+</Note>
+
+<Note>
+  **Stay Updated**
+  - Check the [Changelog](changelog) regularly for new features
+  - Review [System Status](system-status) before reporting issues
+  - Subscribe to update notifications in your profile settings
+</Note>
+
+---
+
+## Need More Help?
+
+If you need additional assistance:
+
+- Review [FAQs](faqs) for quick answers
+- Check [Troubleshooting](troubleshooting) for common issues
+- Contact support at micros.teh@tecnasadesk.com
+- Chat with us on WhatsApp for urgent matters

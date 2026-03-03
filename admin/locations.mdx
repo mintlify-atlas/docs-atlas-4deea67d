@@ -1,0 +1,482 @@
+---
+title: Locations Management
+description: Manage countries, cities, and parking locations in AutoLog
+icon: map-pin
+---
+
+The Locations Management interface allows administrators to maintain geographic data used throughout AutoLog, including countries, cities, and parking facilities.
+
+## Overview
+
+Location management is divided into three main areas:
+
+- **Countries** - Country-level geographic data
+- **Cities** - City/municipality information
+- **Parkings** - Parking facility locations (future)
+
+This geographic hierarchy ensures consistent location data across user profiles, vehicle assignments, and operational reporting.
+
+## Countries Management
+
+### Accessing Countries
+
+Navigate to **Administration > Locations > Countries** to manage country data.
+
+### Permissions Required
+
+| Action | Permission |
+|--------|------------|
+| View countries | `ver_paises` |
+| Create countries | `crear_paises` |
+| Edit countries | `editar_paises` |
+| Delete countries | `eliminar_paises` or `editar_paises` |
+
+<Note>
+Admin users have access to all location management features by default.
+</Note>
+
+### Creating a Country
+
+<Steps>
+  <Step title="Open Country Form">
+    Click the **New Country** button in the toolbar
+  </Step>
+  
+  <Step title="Enter Country Name">
+    <ParamField path="nombre" type="string" required>
+      Country name (2-60 characters)
+    </ParamField>
+    
+    Examples:
+    - Honduras
+    - Guatemala
+    - El Salvador
+  </Step>
+  
+  <Step title="Save">
+    Click **Save** to create the country. The form validates:
+    - Minimum 2 characters
+    - Maximum 60 characters
+    - Required field (cannot be empty)
+  </Step>
+</Steps>
+
+**Validation Schema:**
+
+```javascript
+const validationSchema = yup.object({
+  nombre: yup
+    .string()
+    .transform((v) => (typeof v === 'string' ? v.trim() : v))
+    .min(2, 'Mínimo 2 caracteres')
+    .max(60, 'Máximo 60 caracteres')
+    .required('Requerido'),
+});
+```
+
+### Editing a Country
+
+To modify an existing country:
+
+1. Click the three-dot menu on the country row
+2. Select **Edit**
+3. Update the country name
+4. Click **Save**
+
+The country is updated using:
+
+```javascript
+await updateCountry(countryId, {
+  id: countryId,
+  nombre: trimmedName
+});
+```
+
+### Deleting a Country
+
+<Warning>
+Deleting a country that is referenced by cities or users may cause data integrity issues. Consider the impact before deletion.
+</Warning>
+
+To delete a country:
+
+1. Click the three-dot menu on the country row
+2. Select **Delete** (if available in your configuration)
+3. Confirm the deletion
+
+<Note>
+Delete functionality is currently commented out in the UI but can be enabled by uncommenting the delete menu item in `/pages/Administration/Locations/Countries.jsx:382-389`.
+</Note>
+
+### Searching Countries
+
+Use the search bar to filter countries by name:
+- Real-time filtering as you type
+- Case-insensitive matching
+- Click the X icon to clear search
+
+## Cities Management
+
+### Accessing Cities
+
+Navigate to **Administration > Locations > Cities** to manage city data.
+
+### Permissions Required
+
+| Action | Permission |
+|--------|------------|
+| View cities | `ver_ciudades` |
+| Create cities | `crear_ciudades` |
+| Edit cities | `editar_ciudades` |
+| Delete cities | `eliminar_ciudades` or `editar_ciudades` |
+
+### Creating a City
+
+Cities must be associated with a country.
+
+<Steps>
+  <Step title="Open City Form">
+    Click the **New City** button in the toolbar
+  </Step>
+  
+  <Step title="Enter City Details">
+    <ParamField path="nombre" type="string" required>
+      City name (minimum 2 characters)
+    </ParamField>
+    
+    <ParamField path="id_pais" type="select" required>
+      Select the country this city belongs to
+    </ParamField>
+  </Step>
+  
+  <Step title="Save">
+    Click **Save** to create the city
+  </Step>
+</Steps>
+
+**Validation Schema:**
+
+```javascript
+const validationSchema = yup.object({
+  nombre: yup
+    .string()
+    .transform((v) => (typeof v === 'string' ? v.trim() : v))
+    .min(2, 'Mínimo 2 caracteres')
+    .required('Requerido'),
+  id_pais: yup.string().required('Debes seleccionar un país'),
+});
+```
+
+### Editing a City
+
+To modify an existing city:
+
+1. Click the three-dot menu on the city row
+2. Select **Edit**
+3. Update the city name or country
+4. Click **Save**
+
+<Note>
+Changing a city's country association may affect users and vehicles assigned to that city. Verify impact before saving.
+</Note>
+
+### Deleting a City
+
+To delete a city:
+
+1. Click the three-dot menu on the city row
+2. Select **Delete**
+3. Confirm the action
+
+<Warning>
+Deleting a city removes it from user profiles and may affect location-based reports. Ensure no active users or assets are assigned to this city.
+</Warning>
+
+### Searching Cities
+
+The city search filters by:
+- City name
+- Country name (if provided by backend as `pais` or `pais_nombre`)
+
+Search is performed in real-time with case-insensitive matching.
+
+### Cities Display
+
+Cities are displayed in a table with:
+
+| Column | Description |
+|--------|-------------|
+| Name | City name |
+| Country | Country name in a soft chip |
+| Actions | Edit/Delete menu |
+
+Country information appears as a colored chip for quick visual reference.
+
+## Data Loading
+
+### Countries Loading
+
+Countries are loaded using:
+
+```javascript
+const data = await getCountries();
+setCountries(Array.isArray(data) ? data : []);
+```
+
+### Cities Loading
+
+Cities and countries are loaded in parallel for efficiency:
+
+```javascript
+const [citiesData, countriesData] = await Promise.all([
+  getCities(),
+  getCountries(),
+]);
+```
+
+This ensures:
+- Fast page load times
+- Country dropdown is immediately available
+- Reduced waiting time for users
+
+## UI States and Error Handling
+
+### Loading State
+
+While data is loading:
+- Circular progress indicator displayed
+- Table is hidden
+- User cannot perform actions
+
+### Error State
+
+If data loading fails:
+- Error card displayed with descriptive message
+- **Retry** button to reload data
+- Network errors are detected with regex: `/failed to fetch|network/i`
+
+### Empty State
+
+When no locations exist:
+- Icon with "No data" message
+- Encouragement to create first entry
+- New button remains available
+
+### No Search Results
+
+When search yields no matches:
+- "No matches found" message in table
+- Suggestion to clear or modify search
+- All data preserved, only display filtered
+
+## Location Services API
+
+### Countries API
+
+```javascript
+import {
+  getCountries,
+  addCountry,
+  updateCountry,
+  deleteCountry,
+} from '@/services/LocationServices';
+```
+
+**Get all countries:**
+```javascript
+const countries = await getCountries();
+// Returns: Array of { id, nombre }
+```
+
+**Create country:**
+```javascript
+const result = await addCountry({ nombre: 'Nicaragua' });
+```
+
+**Update country:**
+```javascript
+const result = await updateCountry(countryId, {
+  id: countryId,
+  nombre: 'Updated Name'
+});
+```
+
+**Delete country:**
+```javascript
+const result = await deleteCountry(countryId);
+```
+
+### Cities API
+
+```javascript
+import {
+  getCities,
+  addCity,
+  updateCity,
+  deleteCity,
+} from '@/services/LocationServices';
+```
+
+**Get all cities:**
+```javascript
+const cities = await getCities();
+// Returns: Array of { id, nombre, id_pais, pais_nombre }
+```
+
+**Create city:**
+```javascript
+const result = await addCity({
+  nombre: 'Tegucigalpa',
+  id_pais: '1'
+});
+```
+
+**Update city:**
+```javascript
+const result = await updateCity(cityId, {
+  id: cityId,
+  nombre: 'Updated Name',
+  id_pais: '1'
+});
+```
+
+**Delete city:**
+```javascript
+const result = await deleteCity(cityId);
+```
+
+## Integration with User Management
+
+Locations integrate with user management:
+
+### User City Assignment
+
+When creating or editing users:
+1. Cities are loaded as autocomplete options
+2. User selects city from dropdown
+3. City ID is stored in `id_ciudad` field
+4. City name is displayed in user table
+
+```javascript
+<Autocomplete
+  options={ciudades}
+  getOptionLabel={(opt) => opt?.nombre ?? opt?.ciudad ?? ''}
+  value={ciudades.find(c => String(c.id) === String(formik.values.ciudad)) || null}
+  onChange={(_, opt) => formik.setFieldValue('ciudad', opt ? String(opt.id) : '')}
+/>
+```
+
+### City Resolution
+
+User city names are resolved using:
+
+```javascript
+const getCiudadNombre = useCallback(
+  (id) => ciudades.find(c => String(c.id) === String(id))?.nombre || '',
+  [ciudades]
+);
+```
+
+## Best Practices
+
+<Note>
+**Location Data Management**
+
+1. **Standardize Names**: Use official country and city names
+2. **Avoid Duplicates**: Check for existing entries before creating new ones
+3. **Maintain Hierarchy**: Always assign cities to correct countries
+4. **Plan Before Deleting**: Verify no users or assets depend on location
+5. **Regular Audits**: Review location data quarterly for accuracy
+</Note>
+
+<Warning>
+**Data Integrity Warnings**
+
+- Deleting a country with associated cities will cause orphaned records
+- Deleting a city assigned to users will break user profiles
+- Always check dependencies before deletion
+- Consider deactivation instead of deletion for historical data
+- Backup location data before bulk changes
+</Warning>
+
+## Troubleshooting
+
+### Countries Not Loading
+
+1. Verify `ver_paises` permission
+2. Check network connection
+3. Look for errors in browser console
+4. Ensure LocationServices endpoints are configured
+5. Click Retry button if error state is shown
+
+### Cities Not Loading
+
+1. Verify `ver_ciudades` permission
+2. Check if countries loaded successfully (cities depend on countries)
+3. Review network tab for failed API calls
+4. Verify backend returns proper format: `{ id, nombre, id_pais, pais_nombre }`
+
+### Country Dropdown Empty in City Form
+
+1. Ensure countries were loaded before opening form
+2. Check `countriesList` state in component
+3. Verify parallel loading didn't fail for countries
+4. Reload page to trigger fresh data fetch
+
+### Save Operations Failing
+
+1. Check form validation errors (red text below fields)
+2. Verify required fields are filled
+3. Ensure country is selected for cities
+4. Check backend logs for validation errors
+5. Verify you have create/edit permissions
+
+### Search Not Working
+
+1. Ensure data has loaded (not in loading state)
+2. Try clearing search and re-entering
+3. Check if special characters are causing issues
+4. Verify search term matches actual data
+
+## Performance Considerations
+
+### Lazy Loading
+
+Location components implement efficient loading patterns:
+- Data loaded only when page is accessed
+- Parallel requests for cities and countries
+- Minimal re-renders with React hooks
+
+### Filtering Performance
+
+Search filtering uses `useMemo` for optimal performance:
+
+```javascript
+const filtered = useMemo(() => {
+  const s = search.toLowerCase();
+  return cities.filter(c => {
+    const cityName = (c.nombre || '').toLowerCase();
+    const countryName = (c.pais || '').toLowerCase();
+    return cityName.includes(s) || countryName.includes(s);
+  });
+}, [cities, search]);
+```
+
+Filtering recalculates only when `cities` or `search` changes.
+
+## Future Features
+
+### Parkings Management
+
+Planned parking facility management will include:
+- GPS coordinates
+- Capacity information
+- Operating hours
+- Contact details
+- Association with cities
+
+## Related Pages
+
+- [User Management](admin/user-management) - Assign users to locations
+- [Permissions](admin/permissions) - Configure location permissions
+- [Settings](admin/settings) - System configuration

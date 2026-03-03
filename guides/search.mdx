@@ -1,0 +1,392 @@
+---
+title: Global Search
+description: Quickly find vehicles, assets, employees, and records across AutoLog
+---
+
+## Overview
+
+AutoLog's Global Search feature provides fast, cross-module searching to help you locate vehicles, assets, employees, registrations, and other resources quickly. The search system is optimized for speed and relevance.
+
+## Accessing Global Search
+
+Global Search is available from:
+
+- **Search bar** in the main navigation header
+- **Keyboard shortcut**: `Ctrl+K` or `Cmd+K` (Mac)
+- **Quick access**: Click the search icon anywhere in the application
+
+<Tip>
+  The search bar is always accessible at the top of the page for instant access.
+</Tip>
+
+## How Search Works
+
+When you type a query, AutoLog searches across multiple data types:
+
+### Searchable Entities
+
+<Info>
+  Search looks through:
+  
+  - **Vehicles**: By license plate, make, model, or VIN
+  - **Assets**: By code, name, model, or serial number
+  - **Employees**: By name, email, or employee ID
+  - **Registrations**: By registration ID or vehicle plate
+  - **Clients**: By client name or site name
+  - **Warehouses**: By name or location
+</Info>
+
+### Search Algorithm
+
+The search system:
+1. **Analyzes your query**: Detects patterns (e.g., plate format, asset code structure)
+2. **Searches relevant fields**: Prioritizes exact matches
+3. **Ranks results**: Most relevant items appear first
+4. **Limits results**: Returns top 10 matches by default (configurable)
+
+## Performing a Search
+
+<Steps>
+  <Step title="Open Search">
+    Click the search bar or press `Ctrl+K`.
+  </Step>
+  
+  <Step title="Enter Query">
+    Type your search term:
+    - Partial matches work ("HAA" finds "HAA-1234")
+    - Case-insensitive
+    - Accent-insensitive ("José" matches "Jose")
+  </Step>
+  
+  <Step title="View Results">
+    Results appear instantly as you type:
+    - Grouped by entity type
+    - Icons indicate resource type
+    - Key information displayed
+  </Step>
+  
+  <Step title="Select Result">
+    Click a result to:
+    - Navigate to detail page
+    - Open quick preview (if available)
+    - Perform context actions
+  </Step>
+</Steps>
+
+## Search Syntax
+
+### Basic Search
+
+Simply type what you're looking for:
+
+```
+HAA-1234          → Finds vehicle with plate HAA-1234
+MacBook           → Finds assets named "MacBook"
+Juan Perez        → Finds employee "Juan Perez"
+```
+
+### Exact Phrase Search
+
+Use quotes for exact matches:
+
+```
+"Dell Monitor"    → Only items with exact phrase
+"HAA-1234"        → Exact plate match
+```
+
+### Entity-Specific Search
+
+Prefix your query to search specific entity types:
+
+```
+vehicle:HAA       → Only search vehicles
+activo:LAP-001    → Only search assets
+empleado:juan     → Only search employees
+```
+
+<Note>
+  Entity prefixes are optional. The system automatically detects context in most cases.
+</Note>
+
+## Search Results
+
+### Result Cards
+
+Each result displays:
+
+**Vehicle Results**
+- License plate (bold)
+- Make and model
+- Current status
+- Location
+
+**Asset Results**
+- Asset code
+- Name and type
+- Current status
+- Destination (warehouse, employee, client)
+
+**Employee Results**
+- Full name
+- Email address
+- Job position
+- Department/location
+
+**Registration Results**
+- Registration ID
+- Vehicle used
+- Employee name
+- Date and status
+
+### Result Actions
+
+Hover over a result to see available actions:
+
+- **View Details**: Open full information page
+- **Quick Preview**: See summary without navigating
+- **Copy Link**: Copy URL to clipboard
+- **Related Items**: View connected resources
+
+## Preview Pane
+
+For supported entities, click the preview icon to see details without leaving your current page.
+
+### Preview Contents
+
+**Vehicle Preview**
+- Photo (if available)
+- Complete specifications
+- Current assignment
+- Recent activity
+- Quick actions (Reserve, Check Out)
+
+**Asset Preview**
+- QR code
+- Full specifications
+- Current location
+- Movement history
+- Quick actions (Move, Edit)
+
+**Employee Preview**
+- Contact information
+- Active vehicle assignments
+- Reservation schedule
+- Quick actions (Message, View Profile)
+
+<Info>
+  Previews load data dynamically from `/api/preview?kind={type}&id={id}` (src/services/search.api.js:15)
+</Info>
+
+## Advanced Features
+
+### Recent Searches
+
+AutoLog remembers your recent searches:
+- Displayed when you open search with no query
+- Click to re-run the search
+- Clear history from search settings
+
+### Search Filters
+
+Refine results using filters:
+
+**Status Filter**
+- Active only
+- Include inactive
+- Specific statuses
+
+**Date Range**
+- Created/modified within timeframe
+- Useful for registrations and movements
+
+**Location Filter**
+- Limit to specific city/warehouse
+- Filter by assignment type
+
+### Keyboard Navigation
+
+<Accordion title="Search Keyboard Shortcuts">
+  - `Ctrl+K` / `Cmd+K`: Open search
+  - `Esc`: Close search
+  - `↓` / `↑`: Navigate results
+  - `Enter`: Open selected result
+  - `Ctrl+Enter`: Open in new tab
+  - `Tab`: Cycle through result groups
+</Accordion>
+
+## Search Performance
+
+### Optimization Features
+
+1. **Debounced Input**: Waits 300ms after you stop typing before searching
+2. **Request Cancellation**: Abandons slow queries when you type more
+3. **Result Caching**: Remembers recent searches for instant re-display
+4. **Indexed Fields**: Database indexes on commonly searched fields
+
+### Result Limits
+
+Default limits per entity type:
+- Vehicles: 10 results
+- Assets: 10 results
+- Employees: 10 results
+- Others: 5 results
+
+<Tip>
+  If you don't see what you're looking for, try more specific search terms or use filters.
+</Tip>
+
+## Search in Specific Modules
+
+Beyond global search, each module has its own search functionality:
+
+### Vehicle List Search
+- Searches only vehicles
+- Includes more fields (location, status)
+- Remembers filters
+
+### Asset List Search
+- Full inventory search
+- Warehouse-specific filtering
+- Advanced type/status filters
+
+### Employee Directory Search
+- Department filtering
+- Role-based search
+- Supervisor hierarchy search
+
+<Note>
+  Module-specific searches are more powerful for deep exploration within a single entity type.
+</Note>
+
+## API Integration
+
+The search system uses a dedicated API endpoint:
+
+### Endpoint
+
+```javascript
+GET /api/search?q={query}&limit={limit}
+```
+
+**Parameters**:
+- `q` (required): Search query string
+- `limit` (optional): Max results per type (default: 10)
+
+**Response**:
+```json
+{
+  "results": [
+    {
+      "kind": "vehicle",
+      "id": 123,
+      "title": "HAA-1234",
+      "subtitle": "Toyota Corolla 2020",
+      "score": 95,
+      "moduleUrl": "/admin/vehiculos?focus=123"
+    }
+  ],
+  "total": 1,
+  "query": "HAA",
+  "took_ms": 45
+}
+```
+
+<Info>
+  Search API implementation: `src/services/search.api.js`
+</Info>
+
+## Permissions and Visibility
+
+### What You Can Search
+
+Search respects your permissions:
+- You only see results you have permission to view
+- Hidden entities (inactive, restricted) may be excluded
+- Some fields may be redacted based on role
+
+### Sensitive Data
+
+Certain information is protected:
+- Personal employee data (for non-HR users)
+- Financial information
+- Restricted client details
+
+<Warning>
+  If you need access to search results that are currently hidden, contact your administrator to request additional permissions.
+</Warning>
+
+## Troubleshooting
+
+### No Results Found
+
+**Problem**: Search returns empty even though you know the item exists
+
+**Solutions**:
+- Check spelling and try variations
+- Use partial terms ("HAA" instead of full plate)
+- Verify you have permission to view the entity
+- Check if item is inactive (try including inactive filter)
+- Try searching in the specific module instead of global search
+
+### Search is Slow
+
+**Problem**: Results take a long time to appear
+
+**Solutions**:
+- Check network connection
+- Clear browser cache
+- Try more specific search terms (reduces result set)
+- Contact administrator if slowness persists (may need index optimization)
+
+### Wrong Results Appearing
+
+**Problem**: Results don't match your query
+
+**Solutions**:
+- Use exact phrase search with quotes
+- Add entity-type prefix
+- Check for typos in your query
+- Use filters to narrow by status/type
+
+## Best Practices
+
+### Effective Searching
+
+<Accordion title="Search Tips for Better Results">
+  1. **Be specific**: "HAA-1234" beats "HAA"
+  2. **Use unique identifiers**: Asset codes, plates, IDs are fastest
+  3. **Try variations**: If name search fails, try email or ID
+  4. **Use filters**: Narrow by status or location
+  5. **Check spelling**: Typos significantly affect results
+  6. **Start broad, then narrow**: Begin with general term, add details if needed
+</Accordion>
+
+### When to Use Global vs Module Search
+
+**Use Global Search when**:
+- You don't know where the item is
+- You want cross-module results
+- You need quick lookup by ID/code
+
+**Use Module Search when**:
+- You know the entity type
+- You need advanced filtering
+- You want to browse all items of a type
+
+## Related Features
+
+- [Dashboard](dashboard): Quick access to recent items
+- [Reports](reports): Advanced querying and analytics
+- [Notifications](notifications): Alerts about search-related events
+
+## Future Enhancements
+
+Planned search improvements:
+- Natural language queries ("vehicles used by John")
+- Saved searches and alerts
+- Full-text content search (documents, notes)
+- AI-powered suggestions
+
+<Tip>
+  Submit feedback or feature requests to help prioritize search enhancements.
+</Tip>

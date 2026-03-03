@@ -1,0 +1,650 @@
+---
+title: Quick Start Guide
+description: Get started with AutoLog in minutes - from login to your first vehicle registration
+---
+
+# Quick Start Guide
+
+This guide will walk you through setting up your AutoLog account and performing common tasks. By the end, you'll know how to navigate the system, create your first vehicle entry, and understand the core workflows.
+
+<Info>
+**Estimated Time**: 10-15 minutes to complete this guide and start managing your fleet effectively.
+</Info>
+
+## Prerequisites
+
+Before you begin:
+- You should have received login credentials from your system administrator
+- A modern web browser (Chrome, Firefox, Safari, or Edge recommended)
+- Optional: Mobile device with QR code scanner for vehicle registration
+
+## Step 1: Logging In
+
+<Steps>
+  <Step title="Navigate to Login Page">
+    Open your browser and navigate to your AutoLog instance URL (e.g., `https://autolog.yourcompany.com`).
+  </Step>
+  
+  <Step title="Enter Credentials">
+    ```javascript
+    // Login form accepts username and password
+    {
+      username: "your-username",
+      password: "your-password"
+    }
+    ```
+    
+    Enter your username and password provided by your administrator.
+  </Step>
+  
+  <Step title="Two-Factor Authentication (if enabled)">
+    If your account has 2FA enabled, you'll see a second screen:
+    
+    <CardGroup cols={2}>
+      <Card title="Enter 6-Digit Code">
+        Open your authenticator app (Google Authenticator, Authy, etc.) and enter the 6-digit code
+      </Card>
+      <Card title="Verify & Login">
+        Click "Verify" to complete authentication and access the system
+      </Card>
+    </CardGroup>
+  </Step>
+  
+  <Step title="Automatic Redirect">
+    Upon successful login, you'll be redirected based on your role:
+    - **Admin/Supervisor**: Dashboard (Home) page with KPIs and analytics
+    - **Employee**: Vehicle Registration Panel for checking in/out vehicles
+  </Step>
+</Steps>
+
+<Tip>
+**First-Time Login**: If this is your first login, you'll be prompted to change your password. Choose a strong password with at least 8 characters, including uppercase, lowercase, and numbers.
+</Tip>
+
+## Step 2: Understanding the Dashboard
+
+The dashboard is your command center for monitoring fleet activity.
+
+### Dashboard Layout
+
+```jsx
+// The dashboard displays real-time KPIs
+const kpis = [
+  {
+    title: "Active Vehicles",
+    value: "8 / 25", // 8 vehicles currently in use out of 25 total
+    icon: DirectionsCarIcon,
+    color: "primary"
+  },
+  {
+    title: "Today's Activity",
+    value: 14, // 14 vehicle movements today
+    icon: CheckCircleRoundedIcon,
+    color: "success"
+  },
+  {
+    title: "Total Employees",
+    value: 42,
+    icon: PersonIcon,
+    color: "neutral"
+  },
+  {
+    title: "Pending Maintenance",
+    value: 0,
+    icon: PendingActionsRoundedIcon,
+    color: "warning"
+  }
+]
+```
+
+### Key Dashboard Elements
+
+<CardGroup cols={2}>
+  <Card title="KPI Cards" icon="chart-simple">
+    Four metric cards at the top show:
+    - Active vehicles vs total fleet
+    - Today's registration count
+    - Employee count
+    - Maintenance alerts
+  </Card>
+  
+  <Card title="Top Performers" icon="chart-bar">
+    Two bar charts display:
+    - Employees with most trips
+    - Most frequently used vehicles
+  </Card>
+  
+  <Card title="Detailed Tables" icon="table">
+    Bottom section shows:
+    - Mileage by employee (kilometers)
+    - Fuel consumption by vehicle (with progress bars)
+  </Card>
+  
+  <Card title="Refresh Button" icon="rotate">
+    Click the refresh icon in the top-right to reload all dashboard data
+  </Card>
+</CardGroup>
+
+<Note>
+**Real-Time Data**: All dashboard metrics update in real-time as employees register vehicle usage throughout the day.
+</Note>
+
+## Step 3: Navigating the Interface
+
+### Main Navigation
+
+The left sidebar provides access to all modules:
+
+**Core Modules**
+- **Home** (`/admin/home`): Live clock and welcome screen
+- **Dashboard** (`/admin/dashboard`): Analytics and KPIs
+- **Vehicles** (`/admin/vehiculos`): Fleet management
+- **Vehicle Panel** (`/admin/panel-vehiculos`): Registration interface
+
+**Inventory & Clients**
+- **Inventory → Warehouses** (`/admin/inventario/bodegas`): Warehouse management
+- **Inventory → Assets** (`/admin/inventario/activos`): Asset tracking
+- **Clients** (`/admin/clientes`): Client management
+- **Sites** (`/admin/sites`): Client locations
+
+**Administration**
+- **Users** (`/admin/usuarios`): User management
+- **Countries & Cities** (`/admin/countries`, `/admin/cities`): Location setup
+- **Parking Locations** (`/admin/parkings`): Vehicle parking spots
+- **Reports** (`/admin/reports`): Advanced reporting
+
+**Personal**
+- **My Account** (`/admin/mi-cuenta`): Profile settings
+- **Settings** (`/admin/configuraciones`): System preferences
+- **Help** (`/admin/help`): Documentation and support
+
+### Global Search (Cmd+K)
+
+<Tip>
+**Power User Tip**: Press `Cmd+K` (Mac) or `Ctrl+K` (Windows) anywhere in the application to open global search. Search across vehicles, assets, clients, and more without navigating through menus.
+</Tip>
+
+## Step 4: Creating Your First Vehicle
+
+Let's add a vehicle to your fleet.
+
+<Steps>
+  <Step title="Navigate to Vehicles">
+    Click **Vehicles** in the left sidebar to open the vehicle management page.
+    
+    You'll see:
+    - Search bar to filter existing vehicles
+    - "Show Inactive" toggle to include inactive vehicles
+    - **Add Vehicle** button (if you have create permissions)
+  </Step>
+  
+  <Step title="Click Add Vehicle">
+    Click the **Add Vehicle** button in the top-right toolbar. This opens the vehicle creation modal.
+  </Step>
+  
+  <Step title="Fill Vehicle Details">
+    Complete the form with vehicle information:
+    
+    ```javascript
+    // Required fields
+    const vehicleData = {
+      placa: "ABC-1234",        // License plate (unique)
+      marca: "Toyota",          // Make
+      modelo: "Hilux",          // Model
+      anio: 2023,               // Year
+      estado: "Disponible",     // Status: Disponible, En Uso, En Mantenimiento
+      id_ubicacion_actual: 5    // Current parking location
+    }
+    
+    // Optional fields
+    const optionalData = {
+      vin: "1HGBH41JXMN109186",  // VIN number
+      color: "White",             // Color
+      capacidad_tanque: 80,       // Fuel tank capacity (liters)
+      kilometraje_actual: 45000   // Current odometer reading
+    }
+    ```
+    
+    **Field Descriptions:**
+    - **License Plate**: Unique identifier (e.g., "ABC-1234")
+    - **Make/Model**: Vehicle manufacturer and model
+    - **Year**: Manufacturing year
+    - **Status**: Current availability (defaults to "Disponible")
+    - **Location**: Select from configured parking locations
+  </Step>
+  
+  <Step title="Save the Vehicle">
+    Click **Save** to create the vehicle. You'll see a success message:
+    
+    <Note>
+    "Vehículo agregado correctamente" (Vehicle added successfully)
+    </Note>
+    
+    The vehicle now appears in the vehicles table.
+  </Step>
+  
+  <Step title="Generate QR Code (Optional)">
+    To enable mobile registration:
+    
+    1. Find your new vehicle in the table
+    2. Click the **QR Code** icon in the actions column
+    3. A modal appears showing the QR code
+    4. Click **Download PNG** to save the QR code
+    5. Print and attach to the vehicle's dashboard
+    
+    ```javascript
+    // QR code links to registration form
+    const qrLink = `https://yourinstance.com/admin/panel-vehiculos/register?vehiculo=${vehicleId}`
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+**License Plate Validation**: License plates must be unique across your fleet. The system will prevent duplicate entries.
+</Warning>
+
+## Step 5: Registering Vehicle Usage
+
+Now that you have a vehicle, let's register a trip.
+
+### Option A: Manual Registration
+
+<Steps>
+  <Step title="Navigate to Vehicle Panel">
+    Click **Vehicle Panel** (`/admin/panel-vehiculos`) in the sidebar.
+  </Step>
+  
+  <Step title="Select Vehicle">
+    Choose the vehicle from the dropdown list. Only vehicles with status "Disponible" (Available) will appear.
+  </Step>
+  
+  <Step title="Fill Departure Information">
+    ```javascript
+    const departureData = {
+      id_empleado: 42,              // Employee ID (auto-filled if logged in)
+      nombre_empleado: "Juan Pérez", // Employee name
+      fecha_salida: new Date(),     // Departure timestamp
+      kilometraje_salida: 45000,    // Odometer at departure
+      combustible_salida: 75,       // Fuel level % at departure
+      destino: "Client Site Visit",  // Trip purpose/destination
+      observaciones: "Visiting Acme Corp office" // Optional notes
+    }
+    ```
+  </Step>
+  
+  <Step title="Submit Check-Out">
+    Click **Register Departure**. The vehicle status changes to "En Uso" (In Use) and appears in dashboard KPIs.
+  </Step>
+  
+  <Step title="Register Return (Later)">
+    When the employee returns:
+    
+    1. Navigate back to Vehicle Panel
+    2. System detects pending return for this vehicle
+    3. Fill return information:
+       - Return timestamp (auto-filled)
+       - Final odometer reading
+       - Final fuel level
+       - Return notes
+    4. Click **Register Return**
+    
+    ```javascript
+    const returnData = {
+      fecha_regreso: new Date(),    // Return timestamp
+      kilometraje_regreso: 45078,   // Odometer at return
+      combustible_regreso: 60,      // Fuel level % at return
+      observaciones_regreso: "Completed visit successfully"
+    }
+    
+    // System calculates:
+    const distance = returnData.kilometraje_regreso - departureData.kilometraje_salida; // 78 km
+    const fuelUsed = departureData.combustible_salida - returnData.combustible_regreso; // 15%
+    ```
+  </Step>
+</Steps>
+
+### Option B: QR Code Registration
+
+<Steps>
+  <Step title="Scan QR Code">
+    Employee scans the QR code on the vehicle dashboard using their mobile device camera.
+  </Step>
+  
+  <Step title="Auto-Filled Form">
+    Registration form opens with vehicle pre-selected. Employee only needs to:
+    - Confirm their identity
+    - Enter odometer and fuel readings
+    - Add destination/purpose
+  </Step>
+  
+  <Step title="Submit from Mobile">
+    Tap **Register** to complete check-out. Works offline-first with sync when connection available.
+  </Step>
+</Steps>
+
+<Tip>
+**Smart Conflict Detection**: If an employee scans a QR code for a vehicle already in use, AutoLog detects this and shows who currently has it, with options to notify them or cancel.
+</Tip>
+
+## Step 6: Viewing Reports
+
+Let's check the analytics generated from your vehicle registration.
+
+<Steps>
+  <Step title="Return to Dashboard">
+    Click **Dashboard** in the sidebar to view updated metrics.
+  </Step>
+  
+  <Step title="Check Activity KPI">
+    The "Today's Activity" card now shows at least 1 movement (your registration).
+  </Step>
+  
+  <Step title="View Employee Rankings">
+    Scroll to the "Top Employees" chart. Your employee appears with 1 trip recorded.
+  </Step>
+  
+  <Step title="Check Mileage Table">
+    In the "Mileage by Employee" table, you'll see:
+    - Employee name
+    - Total kilometers: 78 km (or your recorded distance)
+  </Step>
+  
+  <Step title="Review Fuel Consumption">
+    The "Fuel Consumption" table shows:
+    - Vehicle (make/model/plate)
+    - Fuel usage percentage with color-coded progress bar
+  </Step>
+</Steps>
+
+### Export Report
+
+To generate a report:
+
+<Steps>
+  <Step title="Navigate to Reports">
+    Click **Reports** in the sidebar.
+  </Step>
+  
+  <Step title="Select Report Type">
+    Choose from:
+    - Employee activity report
+    - Vehicle utilization report
+    - Fuel consumption report
+    - Mileage report
+  </Step>
+  
+  <Step title="Set Date Range">
+    Use date pickers to select reporting period (e.g., "This Month").
+  </Step>
+  
+  <Step title="Generate & Export">
+    Click **Generate Report**, then choose export format:
+    - **Excel**: Full data with charts
+    - **PDF**: Formatted document
+    - **CSV**: Raw data for analysis
+  </Step>
+</Steps>
+
+## Step 7: Managing Assets (Optional)
+
+If you also manage equipment and assets beyond vehicles:
+
+<Steps>
+  <Step title="Navigate to Assets">
+    Click **Inventory → Assets** (`/admin/inventario/activos`).
+  </Step>
+  
+  <Step title="View Asset List">
+    You'll see a searchable, filterable table of all assets:
+    - Asset code and name
+    - Type (Laptop, Desktop, Monitor, etc.)
+    - Model and serial number
+    - Status (Active, Repair, Backup, Retired)
+    - Current location (Client, Warehouse, Employee)
+  </Step>
+  
+  <Step title="Search & Filter">
+    Use powerful filters:
+    - Text search by code, name, model, or serial
+    - Filter by status (multi-select)
+    - Filter by type (multi-select)
+    - Filter by location type (Clients, Warehouses, Employees)
+  </Step>
+  
+  <Step title="Asset Actions">
+    For each asset, you can:
+    - **Edit**: Update asset details
+    - **Move**: Transfer to different location
+    - **History**: View complete movement history
+    - **QR Code**: Generate public info QR code
+    
+    ```javascript
+    // Example: Moving an asset
+    const movement = {
+      id_activo: 123,
+      tipo_origen: "Bodega",
+      id_origen: 5,
+      tipo_destino: "Cliente",
+      id_destino: 42,
+      id_site: 7,
+      fecha_movimiento: new Date(),
+      realizado_por: currentUser.id,
+      notas: "Deploying laptop to new client site"
+    }
+    ```
+  </Step>
+</Steps>
+
+<Note>
+**Asset Movement History**: Every asset maintains a complete audit trail of all movements, including who moved it, when, why, and from/to where.
+</Note>
+
+## Step 8: Customizing Settings
+
+Personalize AutoLog to match your preferences.
+
+<Steps>
+  <Step title="Open Settings">
+    Click **Settings** (`/admin/configuraciones`) or your profile icon → Settings.
+  </Step>
+  
+  <Step title="Language & Region">
+    Navigate to **Language & Region** tab:
+    - Select **Language**: English or Spanish
+    - Set **Timezone**: Auto-detect or manual
+    - Choose **Date Format**: MM/DD/YYYY or DD/MM/YYYY
+    
+    ```javascript
+    // Language changes apply immediately
+    const settings = {
+      language: "en", // or "es"
+      timezone: "America/Tegucigalpa",
+      dateFormat: "DD/MM/YYYY"
+    }
+    ```
+  </Step>
+  
+  <Step title="Appearance">
+    Navigate to **Appearance** tab:
+    - **Theme**: Light, Dark, or Auto (follows system)
+    - **Primary Color**: Choose your brand color
+    - **Font**: Select from available fonts
+    - **Live Preview**: See changes before saving
+  </Step>
+  
+  <Step title="Security Settings">
+    Navigate to **Security** tab:
+    - **Enable 2FA**: Toggle on and scan QR with authenticator app
+    - **View Sessions**: See all active login sessions
+    - **Login Alerts**: Configure email notifications for new logins
+    - **Change Password**: Update your password regularly
+    
+    <Warning>
+    **Enable 2FA**: We strongly recommend enabling Two-Factor Authentication, especially for Admin and Supervisor accounts.
+    </Warning>
+  </Step>
+  
+  <Step title="Notification Preferences">
+    Navigate to **Notifications** tab:
+    - Configure email alerts for:
+      - Vehicle registrations
+      - Asset movements
+      - System updates
+      - Maintenance reminders
+    - Set in-app notification preferences
+    - Subscribe to notification groups
+  </Step>
+</Steps>
+
+## Keyboard Shortcuts Reference
+
+Become a power user with these keyboard shortcuts:
+
+<CardGroup cols={2}>
+  <Card title="Navigation">
+    - `Cmd/Ctrl + K`: Global search
+    - `/`: Focus page search
+    - `Cmd/Ctrl + Shift + F`: Focus global search
+  </Card>
+  
+  <Card title="Actions">
+    - `Cmd/Ctrl + Shift + N`: Create new (context-aware)
+    - `Cmd/Ctrl + Shift + E`: Export current view
+    - `Cmd/Ctrl + Shift + I`: Import data
+    - `Cmd/Ctrl + Shift + L`: Open filters
+  </Card>
+  
+  <Card title="Lists & Tables">
+    - `Arrow Keys`: Navigate rows
+    - `Enter`: Open selected item
+    - `Escape`: Close modals/drawers
+  </Card>
+  
+  <Card title="Help">
+    - `?`: Show shortcuts for current page
+    - `Cmd/Ctrl + /`: Open help center
+  </Card>
+</CardGroup>
+
+## Common Workflows
+
+### Daily Fleet Manager Workflow
+
+<Steps>
+  <Step title="Morning: Check Dashboard">
+    Review overnight activity, available vehicles, and any maintenance alerts.
+  </Step>
+  
+  <Step title="Throughout Day: Monitor Usage">
+    Track vehicle check-outs and check-ins in real-time via dashboard KPIs.
+  </Step>
+  
+  <Step title="Handle Issues">
+    Respond to vehicle conflicts, maintenance needs, or employee questions.
+  </Step>
+  
+  <Step title="End of Day: Generate Reports">
+    Export daily activity report for records and review fuel consumption.
+  </Step>
+</Steps>
+
+### Asset Manager Workflow
+
+<Steps>
+  <Step title="Receive Asset Request">
+    Client or employee requests equipment.
+  </Step>
+  
+  <Step title="Check Inventory">
+    Search assets by type and status to find available items.
+  </Step>
+  
+  <Step title="Move Asset">
+    Transfer asset from warehouse to client/employee with notes.
+  </Step>
+  
+  <Step title="Generate QR Code">
+    Create and send QR code to recipient for easy asset identification.
+  </Step>
+  
+  <Step title="Track Movement">
+    Movement automatically logged with timestamp and user.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Can't Log In
+
+<Warning>
+**Solution**: Verify your credentials are correct. If you've forgotten your password, click "Forgot Password" on the login screen to request a reset link. Contact your administrator if issues persist.
+</Warning>
+
+### Don't See "Add Vehicle" Button
+
+<Info>
+**Cause**: You don't have the `crear_vehiculo` permission. Contact your system administrator to request permission if you need to create vehicles.
+</Info>
+
+### Dashboard Shows "No Data"
+
+<Tip>
+**Solution**: This is normal for new installations. As you add vehicles and register usage, the dashboard will populate with analytics. Data updates in real-time.
+</Tip>
+
+### QR Code Not Working
+
+<Steps>
+  <Step title="Check URL">
+    Ensure the QR code links to your correct AutoLog instance URL.
+  </Step>
+  <Step title="Test Link">
+    Click "Test Registration Link" in the QR modal to verify it opens correctly.
+  </Step>
+  <Step title="Regenerate">
+    If issues persist, click the QR icon again to regenerate a fresh code.
+  </Step>
+</Steps>
+
+## Next Steps
+
+Now that you've completed the quick start:
+
+<CardGroup cols={3}>
+  <Card title="Explore Features" icon="compass" href="/features">
+    Dive deep into all AutoLog capabilities
+  </Card>
+  
+  <Card title="Set Up Users" icon="users">
+    Add team members and configure permissions
+  </Card>
+  
+  <Card title="Configure Locations" icon="map">
+    Set up countries, cities, and parking locations
+  </Card>
+  
+  <Card title="Import Data" icon="file-import">
+    Bulk import existing vehicles and assets
+  </Card>
+  
+  <Card title="Generate Reports" icon="chart-pie">
+    Create detailed analytics and exports
+  </Card>
+  
+  <Card title="Enable 2FA" icon="shield">
+    Secure your account with two-factor authentication
+  </Card>
+</CardGroup>
+
+## Getting Help
+
+If you need assistance:
+
+- **Help Center**: Click the Help icon in the sidebar to access FAQs, tutorials, and documentation
+- **Keyboard Shortcuts**: Press `?` on any page to see available shortcuts
+- **Support Contact**: Reach out to your system administrator or AutoLog support team
+- **Changelog**: Check **Help → Changelog** to see recent updates and new features
+
+---
+
+Congratulations! You're now ready to use AutoLog effectively. Start by adding your fleet vehicles, and the system will provide valuable insights as usage data accumulates.

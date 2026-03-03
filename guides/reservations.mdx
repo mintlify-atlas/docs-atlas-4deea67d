@@ -1,0 +1,407 @@
+---
+title: Reservations
+description: Schedule and manage vehicle reservations with AutoLog's calendar-based booking system
+---
+
+## Overview
+
+AutoLog's Reservations module allows you to schedule future vehicle use, prevent booking conflicts, and manage reservation lifecycles. The system uses a visual calendar interface powered by FullCalendar for intuitive booking management.
+
+## Reservation Calendar
+
+### Calendar View
+
+The reservation system presents a monthly calendar view showing:
+
+- **Current month**: Default view on page load
+- **Color-coded events**: Visual status indicators
+- **Date cells**: Clickable for new reservations
+- **Existing reservations**: Displayed as colored blocks
+
+### Event Colors
+
+<Info>
+  Reservation colors indicate status at a glance:
+  
+  - **Green** (#4caf50): Active reservation
+  - **Red** (#e53935): Canceled
+  - **Gray** (#757575): Completed/Finished
+</Info>
+
+### Navigation
+
+Use the calendar controls to:
+- **Previous/Next month**: Arrow buttons
+- **Today**: Jump to current date
+- **Month selector**: Quick navigation to any month
+
+## Creating a Reservation
+
+### Click-to-Create
+
+<Steps>
+  <Step title="Select Date Range">
+    Click and drag on the calendar to select:
+    - **Start date**: Beginning of reservation
+    - **End date**: When vehicle must be returned
+    
+    <Note>
+      You cannot select dates in the past. Past dates are disabled automatically.
+    </Note>
+  </Step>
+  
+  <Step title="Reservation Modal Opens">
+    A form appears with:
+    - Pre-filled start and end dates/times
+    - Default times: 8:00 AM start, 5:00 PM end
+    - Vehicle selector
+    - Employee selector
+    - Purpose/reason field
+  </Step>
+  
+  <Step title="Fill Reservation Details">
+    Required information:
+    
+    **Vehicle**:
+    - Select from available vehicles
+    - Only vehicles not already reserved for those dates are shown
+    
+    **Employee**:
+    - Choose who will use the vehicle
+    - Can search by name
+    
+    **Purpose (Motivo)**:
+    - Describe the reason for the reservation
+    - Examples: "Client visit", "Site inspection", "Delivery"
+    
+    **Date/Time Range**:
+    - Adjust if needed
+    - End time must be after start time
+  </Step>
+  
+  <Step title="Submit Reservation">
+    Click "Save" or "Create Reservation."
+    
+    The system:
+    - Validates availability
+    - Creates the reservation
+    - Displays it on the calendar
+    - Sends notification (if configured)
+  </Step>
+</Steps>
+
+<Warning>
+  Reservations cannot overlap for the same vehicle. If a conflict is detected, you'll be asked to choose a different vehicle or adjust the dates.
+</Warning>
+
+## Viewing Reservation Details
+
+### Single-Click vs Double-Click
+
+- **Single-click**: Prevents accidental actions, no effect
+- **Double-click**: Opens the reservation details/edit modal
+
+### Reservation Information
+
+When you double-click a reservation, you'll see:
+
+- **Vehicle**: License plate, make, model
+- **Employee**: Full name and employee details
+- **Purpose**: Reason for reservation
+- **Start date/time**: When reservation begins
+- **End date/time**: When vehicle must be returned
+- **Status**: Current state (Active, Canceled, Finished)
+- **Created by**: Who made the reservation
+- **Created at**: When reservation was made
+
+## Editing Reservations
+
+### Modifying Details
+
+<Steps>
+  <Step title="Open Reservation">
+    Double-click the reservation event on the calendar.
+  </Step>
+  
+  <Step title="Edit Fields">
+    You can modify:
+    - Vehicle (if no other conflicts)
+    - Employee assigned
+    - Purpose/reason
+    - Date and time range
+    - Status
+    
+    <Info>
+      Some fields may be locked based on reservation status. For example, you cannot change the vehicle of a completed reservation.
+    </Info>
+  </Step>
+  
+  <Step title="Save Changes">
+    Click "Update" or "Save."
+    
+    Changes take effect immediately:
+    - Calendar updates
+    - Affected parties are notified
+    - Conflict checks run again
+  </Step>
+</Steps>
+
+### Status Changes
+
+You can change reservation status to:
+
+**Active**
+- Default status for new reservations
+- Vehicle is reserved for the specified period
+
+**Canceled**
+- Use when reservation is no longer needed
+- Frees up the vehicle for other reservations
+- Original details are preserved for record-keeping
+
+**Finished**
+- Marks reservation as completed
+- Automatically set when end time passes (if configured)
+- Vehicle becomes available again
+
+<Tip>
+  Always cancel reservations you no longer need rather than deleting them. This maintains a complete audit trail.
+</Tip>
+
+## Canceling Reservations
+
+<Steps>
+  <Step title="Open the Reservation">
+    Double-click the reservation on the calendar.
+  </Step>
+  
+  <Step title="Change Status">
+    In the edit form, change status to "Canceled."
+  </Step>
+  
+  <Step title="Add Cancellation Reason (Optional)">
+    Update the purpose field with a cancellation note if needed.
+  </Step>
+  
+  <Step title="Save">
+    Click "Save." The reservation:
+    - Turns red on the calendar
+    - Frees the vehicle for other bookings
+    - Remains visible for record-keeping
+  </Step>
+</Steps>
+
+<Note>
+  Canceled reservations remain visible on the calendar but are visually distinguished by their red color.
+</Note>
+
+## Conflict Prevention
+
+### Automatic Validation
+
+AutoLog prevents double-booking by:
+
+1. **Real-time availability check**: When selecting a vehicle
+2. **Date overlap detection**: Ensures no conflicts with existing reservations
+3. **Status consideration**: Only active reservations block availability
+
+### Conflict Resolution
+
+If you encounter a conflict:
+
+**Option 1: Choose Different Vehicle**
+- Select another available vehicle from the list
+- Only vehicles without conflicts are shown
+
+**Option 2: Adjust Dates**
+- Modify start or end time to avoid overlap
+- Even a 1-minute gap resolves the conflict
+
+**Option 3: Cancel Conflicting Reservation**
+- If you have permission, cancel the blocking reservation
+- Then create your new reservation
+
+<Warning>
+  Cannot override conflicts. The system enforces availability rules strictly to prevent operational issues.
+</Warning>
+
+## Searching Reservations
+
+While the calendar provides visual browsing, you can also:
+
+- **Filter by vehicle**: See all reservations for a specific vehicle
+- **Filter by employee**: View an employee's schedule
+- **Date range filter**: Focus on specific time periods
+
+<Info>
+  Advanced filtering may require administrator access or custom configuration.
+</Info>
+
+## Notification System
+
+### Automatic Notifications
+
+Depending on your configuration, AutoLog can send:
+
+**Reservation Confirmation**
+- Sent to: Assigned employee
+- When: Reservation is created
+- Contains: Vehicle details, dates, purpose
+
+**Reminder Notifications**
+- Sent to: Assigned employee
+- When: Before reservation start time
+- Contains: Pickup instructions
+
+**Return Reminders**
+- Sent to: Assigned employee
+- When: Before or at end time
+- Contains: Return instructions
+
+**Cancellation Notice**
+- Sent to: Assigned employee (if notified)
+- When: Reservation is canceled
+- Contains: Cancellation details
+
+<Tip>
+  Ask your administrator about configuring notification timing and content.
+</Tip>
+
+## Reservation vs Check-Out
+
+### Key Differences
+
+| Aspect | Reservation | Check-Out |
+|--------|-------------|----------|
+| **Timing** | Future use | Immediate use |
+| **Purpose** | Planning | Actual vehicle assignment |
+| **Required** | Optional | Yes (for tracking) |
+| **Blocks vehicle** | Yes | Yes |
+| **Creates registration** | No | Yes |
+
+### Workflow Integration
+
+**Typical flow**:
+1. **Reservation made**: Schedule vehicle for next week
+2. **Reservation active**: Vehicle blocked on calendar
+3. **Check-out**: Employee picks up vehicle at scheduled time
+4. **Check-in**: Employee returns vehicle
+5. **Reservation finished**: Marked complete automatically
+
+<Note>
+  Reservations and check-outs are separate systems. A reservation doesn't automatically create a registration—the employee still needs to check out the vehicle using the normal process or QR code.
+</Note>
+
+## Permissions and Access
+
+### Required Permissions
+
+Reservation operations require specific permissions:
+
+- **View Reservations**: See the calendar and events
+- **Create Reservations**: Add new bookings
+- **Edit Reservations**: Modify existing reservations
+- **Cancel Reservations**: Change status to canceled
+- **Manage Reservations**: Full administrative control
+
+### Self-Service Restrictions
+
+Some organizations restrict employees to:
+- Only view their own reservations
+- Create reservations requiring supervisor approval
+- Limited date ranges (e.g., max 30 days ahead)
+
+<Info>
+  Contact your administrator if you need different reservation permissions.
+</Info>
+
+## Mobile Access
+
+The reservation calendar is mobile-responsive:
+
+- Touch-enabled date selection
+- Optimized modal forms
+- Swipe navigation between months
+- Readable event labels on small screens
+
+**Mobile tips**:
+- Use landscape orientation for better calendar view
+- Tap and hold to select date ranges
+- Double-tap events to open details
+
+## Best Practices
+
+### Planning Ahead
+
+<Accordion title="Reservation Planning Tips">
+  1. **Book early**: Reserve popular vehicles well in advance
+  2. **Add buffer time**: Include travel time to/from vehicle location
+  3. **Be specific**: Clear purpose helps others understand vehicle needs
+  4. **Check availability**: Review calendar before committing to client meetings
+  5. **Update promptly**: Cancel or modify if plans change
+</Accordion>
+
+### Team Coordination
+
+- Use descriptive purposes ("Client: Acme Corp visit" vs just "Meeting")
+- Book only what you need—don't reserve "just in case"
+- Check with colleagues before canceling their reservations
+- Communicate via chat/email if you need priority access
+
+### Administrative Management
+
+- Regularly review and clean up old reservations
+- Set organizational policies for booking lead time
+- Configure automated status transitions
+- Monitor reservation vs actual usage patterns
+
+## Troubleshooting
+
+### Cannot Create Reservation
+
+**Problem**: Form won't submit or shows error
+
+**Solutions**:
+- Verify all required fields are filled
+- Check date/time logic (end after start)
+- Ensure selected vehicle is available
+- Confirm you have permission to create reservations
+- Try refreshing the page
+
+### Reservation Not Appearing on Calendar
+
+**Problem**: Created reservation but don't see it
+
+**Solutions**:
+- Refresh the calendar view
+- Check you're viewing the correct month
+- Verify reservation wasn't automatically canceled
+- Look for the event in a different week/month
+- Check browser console for errors
+
+### Vehicle Shows as Unavailable
+
+**Problem**: Cannot select vehicle even though calendar looks clear
+
+**Solutions**:
+- Check for overlapping reservations (zoom in on dates)
+- Verify vehicle isn't marked as inactive/maintenance
+- Confirm vehicle exists and you have permission to reserve it
+- Try selecting a different date range to isolate the conflict
+
+## Technical Reference
+
+**Source Files**:
+- Main component: `src/pages/Register/Reservas.jsx`
+- Modal: `src/components/ReservaModal/ReservaModal.jsx`
+- Services: `src/services/ReservaServices.js`
+
+**Key Functions**:
+- `getReservas()`: Fetch all reservations (line 23)
+- `handleSelect(info)`: Date range selection handler (line 66)
+- `handleEventDoubleClick(info)`: Open reservation details (line 90)
+
+**Libraries**:
+- FullCalendar React (dayGrid + interaction plugins)
+- Date handling and validation
+- Event rendering customization (line 123-136)

@@ -1,0 +1,460 @@
+---
+title: Client Management
+description: Manage client companies, sites, locations, and asset deployments
+---
+
+AutoLog's Client Management module provides comprehensive tools for managing client relationships, multiple sites per client, and asset deployments to client locations.
+
+## Overview
+
+The client management system enables you to:
+- Create and manage client company profiles
+- Track multiple sites (locations) per client
+- Deploy and monitor assets at client sites
+- Manage contracts and agreements
+- View client-specific activity and reports
+
+## Client Companies (Compañías)
+
+### Creating a Client
+
+<Steps>
+  <Step title="Access Client List">
+    Navigate to **Clientes** from the main menu.
+  </Step>
+  
+  <Step title="Open Creation Form">
+    Click **+ Nuevo Cliente** button.
+    
+    The form opens in a side drawer with the following fields:
+  </Step>
+  
+  <Step title="Fill Required Information">
+    **Required fields:**
+    - **Código:** Unique client identifier (e.g., "CLI-001")
+    - **Nombre:** Company name
+    - **Estatus:** Active or Inactive
+    
+    **Optional fields:**
+    - **Descripción:** Company description or notes
+    - **Logo:** Upload company logo (max 2MB)
+  </Step>
+  
+  <Step title="Upload Logo">
+    Click **Subir** to select a logo image:
+    - Accepted formats: PNG, JPG, JPEG, GIF
+    - Maximum size: 2MB
+    - Recommended: Square format, 400x400px minimum
+  </Step>
+  
+  <Step title="Save Client">
+    Click **Guardar** to create the client record
+  </Step>
+</Steps>
+
+**API Service:**
+
+```jsx
+// Source: ClientesServices.jsx:31-48
+export async function createCliente(data, logoFile) {
+  const formData = new FormData();
+  Object.entries(data).forEach(([k, v]) => {
+    if (v !== null && v !== undefined) formData.append(k, v);
+  });
+  if (logoFile) formData.append("logo", logoFile);
+
+  const res = await fetchConToken(endpoints.addCliente, {
+    method: "POST",
+    body: formData,
+  });
+
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.message || json.error || "Error al crear cliente");
+  }
+  return json;
+}
+```
+
+<Note>
+The logo is uploaded as multipart form data, allowing direct file upload without base64 encoding.
+</Note>
+
+### Client List View
+
+The client list provides a comprehensive overview:
+
+<Tabs>
+  <Tab title="Desktop View">
+    Modern table layout with:
+    
+    **Columns:**
+    - Company name with logo avatar
+    - Client code (monospace font)
+    - Description
+    - Status badge (active/inactive)
+    - Actions menu
+    
+    **Features:**
+    - Sortable columns (name, code, status)
+    - Hover effects for better interaction
+    - Click row to view details
+    - Compact, breathable padding
+  </Tab>
+  
+  <Tab title="Mobile View">
+    Card-based layout optimized for touch:
+    
+    - Logo avatar with first letter fallback
+    - Company name and code
+    - Status chip
+    - "Ver detalles" button
+    - Swipe-friendly spacing
+  </Tab>
+</Tabs>
+
+### Filtering and Search
+
+```jsx
+// Source: ClientesList.jsx:195-207
+const filtered = useMemo(() => {
+  const src = Array.isArray(rows) ? rows : [];
+  const q = (search || "").trim().toLowerCase();
+  return src.filter((r) => {
+    const matchSearch =
+      !q ||
+      (r.codigo || "").toLowerCase().includes(q) ||
+      (r.nombre || "").toLowerCase().includes(q);
+    const matchStatus =
+      statusFilter === "todos" ? true : r.estatus === statusFilter;
+    return matchSearch && matchStatus;
+  });
+}, [rows, search, statusFilter]);
+```
+
+**Available Filters:**
+
+| Filter Type | Options | Description |
+|-------------|---------|-------------|
+| **Search** | Free text | Searches code and name |
+| **Status** | Todos, Activo, Inactivo | Filter by client status |
+
+### Sorting
+
+Click column headers to sort:
+- **Nombre** - Alphabetical by company name
+- **Código** - Alphanumeric by client code
+- **Estatus** - Group by active/inactive
+
+Direction toggles between ascending (↑) and descending (↓).
+
+## Client Details
+
+Click any client to view comprehensive details across multiple tabs.
+
+### Information Tab
+
+<CardGroup cols={2}>
+  <Card title="Company Profile" icon="building">
+    - Company name and code
+    - Description/notes
+    - Current status
+    - Company logo
+    - Edit capabilities
+  </Card>
+  
+  <Card title="Statistics" icon="chart-bar">
+    - Total sites
+    - Active assets deployed
+    - Active contracts
+    - Last activity date
+  </Card>
+</CardGroup>
+
+### Sites Tab
+
+Manage client locations and facilities.
+
+## Site Management
+
+Sites represent physical locations for each client (offices, warehouses, retail stores, etc.).
+
+### Creating a Site
+
+<Steps>
+  <Step title="Navigate to Sites">
+    From the client detail page, click the **Sites** tab
+  </Step>
+  
+  <Step title="Add New Site">
+    Click **+ Nuevo Site** button
+  </Step>
+  
+  <Step title="Fill Site Information">
+    **Required:**
+    - **Nombre:** Site name (e.g., "Main Office", "Warehouse 2")
+    
+    **Optional:**
+    - **Descripción:** Site description or notes
+    - **Ciudad:** City/location (select from list)
+    - **Activo:** Active status (default: Yes)
+  </Step>
+  
+  <Step title="Save Site">
+    Click **Guardar** - site is created and linked to client
+  </Step>
+</Steps>
+
+**API Service:**
+
+```jsx
+// Source: SitesServices.jsx:42-51
+export async function createSite(data) {
+  const res = await fetchConToken(endpoints.addSite, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || "Error al crear site");
+  return json;
+}
+```
+
+### Site List Features
+
+**Table Columns:**
+- ☑️ Bulk selection checkbox
+- Site name
+- Description
+- City (with location icon)
+- Status badge
+- Edit action
+
+**Bulk Actions:**
+
+Select multiple sites to:
+- **Activate selected** - Enable multiple sites at once
+- **Deactivate selected** - Disable multiple sites
+
+```jsx
+// Source: ClienteSites.jsx:309-338
+async function bulkUpdateActivo(newActivo) {
+  if (!canEdit) return showToast(t("common.no_permission"), "warning");
+  if (!selectedIds.length) return;
+  setBulkSaving(true);
+  try {
+    await Promise.all(
+      selectedIds.map((idSite) => {
+        const row = rows.find((r) => r.id === idSite);
+        if (!row) return null;
+        return updateSite(idSite, {
+          id_cliente: id,
+          nombre: row.nombre,
+          descripcion: row.descripcion || null,
+          id_ciudad: row.id_ciudad || null,
+          activo: newActivo ? 1 : 0,
+        });
+      })
+    );
+    showToast(t("clients.sites.success.bulk_updated"), "success");
+    setSelectedIds([]);
+    load();
+  } catch (err) {
+    showToast(
+      err?.message || t("clients.sites.errors.bulk_failed"),
+      "danger"
+    );
+  } finally {
+    setBulkSaving(false);
+  }
+}
+```
+
+### Site Filtering
+
+Advanced filter drawer with:
+
+<Accordion title="City Filter">
+  Filter sites by city/location:
+  - Dropdown populated from existing sites
+  - Shows only cities with sites
+  - "All Cities" option to clear filter
+</Accordion>
+
+<Accordion title="Status Filter">
+  Three options:
+  - **Activos** (Active) - Default view
+  - **Inactivos** (Inactive) - Disabled sites
+  - **Todos** (All) - Show everything
+</Accordion>
+
+**Filter Implementation:**
+
+```jsx
+// Source: ClienteSites.jsx:167-185
+const filtered = useMemo(() => {
+  const s = normalize(search);
+  return (rows || []).filter((r) => {
+    const matchSearch =
+      normalize(r.nombre).includes(s) ||
+      normalize(r.descripcion).includes(s) ||
+      normalize(r.ciudad).includes(s);
+    const matchCity =
+      !cityFilter || String(r.id_ciudad) === String(cityFilter);
+    const isActivo = isActivoVal(r.activo);
+    const matchStatus =
+      statusFilter === "activos"
+        ? isActivo
+        : statusFilter === "inactivos"
+        ? !isActivo
+        : true;
+    return matchSearch && matchCity && matchStatus;
+  });
+}, [rows, search, cityFilter, statusFilter]);
+```
+
+### Pagination
+
+Sites are paginated for better performance:
+- **10 rows per page** (configurable)
+- Page navigation controls
+- "Showing X of Y" counter
+
+```jsx
+// Source: ClienteSites.jsx:188-192
+const totalPages = Math.ceil(filtered.length / rowsPerPage);
+const paginatedRows = useMemo(() => {
+  const start = (page - 1) * rowsPerPage;
+  return filtered.slice(start, start + rowsPerPage);
+}, [filtered, page]);
+```
+
+## Assets Tab
+
+View and manage assets deployed to the client.
+
+### Deployed Assets Overview
+
+<CardGroup cols={3}>
+  <Card title="Total Assets" icon="package">
+    Count of all assets at client sites
+  </Card>
+  
+  <Card title="By Status" icon="activity">
+    Breakdown:
+    - Available
+    - In Use
+    - Maintenance
+    - Damaged
+  </Card>
+  
+  <Card title="By Type" icon="grid">
+    Asset categories:
+    - Computers
+    - Monitors
+    - Network gear
+    - Other equipment
+  </Card>
+</CardGroup>
+
+### Asset Actions
+
+**Quick Actions per Asset:**
+- 📝 **Edit** - Update asset information
+- 🔄 **Move** - Transfer to different location
+- 📜 **History** - View movement history
+- 📱 **QR Code** - Generate/download QR code
+
+**Bulk Actions:**
+- Move multiple assets
+- Update status in bulk
+- Export asset list
+
+## Contracts Tab
+
+Manage service agreements and contracts with clients.
+
+<Note>
+Contract management is in development. This section will be expanded with:
+- Contract creation and editing
+- Terms and conditions tracking
+- Renewal reminders
+- Document attachments
+- Contract history
+</Note>
+
+## Keyboard Shortcuts
+
+Navigate faster with keyboard shortcuts:
+
+| Shortcut | Action |
+|----------|--------|
+| `/` | Focus search |
+| `Ctrl/Cmd + Shift + F` | Quick search |
+| `Ctrl/Cmd + Shift + N` | New client (list view) |
+| `Ctrl/Cmd + Shift + N` | New site (sites tab) |
+
+## Permissions
+
+Client management requires specific permissions:
+
+| Action | Permission Required |
+|--------|--------------------|
+| View clients | `ver_companias` |
+| Create client | `crear_companias` |
+| Edit client | `editar_companias` |
+| View sites | `ver_sites` |
+| Create site | `crear_sites` |
+| Edit site | `editar_sites` |
+| View client assets | `ver_activos` |
+| Manage contracts | `gestionar_contratos` |
+
+**Permission Checking:**
+
+```jsx
+// Source: ClientesList.jsx:82-83
+const canView = canAny("ver_companias");
+const canCreate = canAny("crear_companias");
+
+// Source: ClienteSites.jsx:78-80
+const canView = can("ver_sites");
+const canCreate = can("crear_sites");
+const canEdit = can("editar_sites");
+```
+
+## Best Practices
+
+<Accordion title="Client Organization">
+  - Use consistent naming conventions for client codes
+  - Keep descriptions concise but informative
+  - Upload high-quality logos for professional appearance
+  - Regularly review and update client status
+</Accordion>
+
+<Accordion title="Site Management">
+  - Create sites before deploying assets
+  - Use descriptive site names (avoid "Site 1", "Site 2")
+  - Keep city information accurate for reporting
+  - Deactivate sites when closed, don't delete
+</Accordion>
+
+<Accordion title="Asset Deployment">
+  - Document assets before client deployment
+  - Generate QR codes for all deployed assets
+  - Schedule regular asset audits at client sites
+  - Track asset condition changes promptly
+</Accordion>
+
+<Accordion title="Data Management">
+  - Review inactive clients quarterly
+  - Archive old sites rather than deleting
+  - Export client data for backup regularly
+  - Keep contact information current
+</Accordion>
+
+## Related Resources
+
+- [Asset Tracking](features/asset-tracking) - Deploy assets to clients
+- [Reporting](features/reporting) - Client activity reports
+- [Fleet Management](features/fleet-management) - Assign vehicles to clients

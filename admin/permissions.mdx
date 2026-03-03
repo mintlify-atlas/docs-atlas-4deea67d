@@ -1,0 +1,394 @@
+---
+title: Permissions Management
+description: Configure role-based access control and user permissions in AutoLog
+icon: shield-check
+---
+
+The Permissions Management system provides granular control over user access to features and data throughout AutoLog. Permissions are assigned per user and organized into functional groups.
+
+## Overview
+
+Permissions are managed through the User Permissions Drawer (`/components/Users/Permissions/UserPermissionsDrawer.jsx`), which provides:
+
+- Group-based permission organization
+- Individual permission toggles
+- Search and filtering capabilities
+- Cascading permission logic (optional)
+- Real-time permission updates
+
+## Accessing Permission Management
+
+<Steps>
+  <Step title="Navigate to Users">
+    Go to the User Management page
+  </Step>
+  
+  <Step title="Select User">
+    Click the three-dot menu on any user row
+  </Step>
+  
+  <Step title="Open Permissions">
+    Select **Permissions** from the dropdown menu
+  </Step>
+</Steps>
+
+<Note>
+Only Admin users or users with `asignar_permisos` permission can manage permissions.
+</Note>
+
+## Permission Structure
+
+Permissions are organized in a hierarchical structure:
+
+```javascript
+{
+  "Vehiculos": [
+    { nombre: "ver_vehiculos", descripcion: "View vehicles", asignado: true },
+    { nombre: "crear_vehiculo", descripcion: "Create vehicles", asignado: false },
+    { nombre: "editar_vehiculo", descripcion: "Edit vehicles", asignado: false }
+  ],
+  "Usuarios": [
+    { nombre: "ver_usuarios", descripcion: "View users", asignado: true },
+    { nombre: "crear_usuario", descripcion: "Create users", asignado: false }
+  ]
+}
+```
+
+Each permission includes:
+
+<ParamField path="nombre" type="string" required>
+  Unique permission identifier (snake_case format)
+</ParamField>
+
+<ParamField path="descripcion" type="string">
+  Human-readable description of what the permission grants
+</ParamField>
+
+<ParamField path="asignado" type="boolean" required>
+  Whether the permission is currently assigned to the user
+</ParamField>
+
+## Permission Groups
+
+Permissions are organized into functional groups for better management:
+
+### Standard Groups
+
+Standard groups display all permissions as individual toggleable items:
+
+- **Vehiculos** - Vehicle management permissions
+- **Usuarios** - User management permissions
+- **Clientes** - Client management permissions
+- **Inventario** - Inventory permissions
+- **Reportes** - Reporting and analytics permissions
+- **Configuraciones** - System configuration permissions
+
+### Cascading Groups (Optional)
+
+Cascading groups feature a master toggle that controls access to a feature set:
+
+```javascript
+const CASCADING_CONFIG = {
+  Vehiculos: {
+    isCascade: true,
+    masterPermission: "gestion_vehiculos",
+    titleKey: "permissions.groups.vehicles.title",
+    descKey: "permissions.groups.vehicles.desc",
+  }
+}
+```
+
+**Cascading Logic:**
+1. Master toggle enables/disables the entire group
+2. When master is ON, sub-permissions become available
+3. When master is OFF, all sub-permissions are disabled
+4. Visual highlighting indicates active cascading groups
+
+<Note>
+Cascading mode is currently disabled by default (`isCascade: false`). Enable it in the configuration to activate this behavior.
+</Note>
+
+## Managing Permissions
+
+### Assigning Individual Permissions
+
+To grant or revoke a single permission:
+
+1. Open the permissions drawer for a user
+2. Find the permission in the list
+3. Toggle the switch to enable/disable
+4. Click **Save Changes** at the bottom
+
+### Using Search
+
+The search bar filters permissions by:
+- Permission name (`nombre`)
+- Permission description (`descripcion`)
+- Group name
+
+Search results update in real-time as you type.
+
+### Master Toggle (Cascading Groups)
+
+For groups with cascading enabled:
+
+1. Toggle the master switch in the group header
+2. When enabled, the group expands to show sub-permissions
+3. Individual sub-permissions can be fine-tuned
+4. Disabling the master toggle removes all group permissions
+
+### Bulk Operations
+
+To efficiently manage multiple permissions:
+
+1. Use the search to filter relevant permissions
+2. Toggle multiple switches before saving
+3. Click **Save Changes** once to apply all changes
+
+All permission changes are sent to the backend in a single request using `updateUserPermissions(userId, permissionList)`.
+
+## Permission Refresh and Caching
+
+The permissions service implements cache-busting to ensure fresh data:
+
+```javascript
+const timestamp = new Date().getTime();
+const url = `${endpoints.getUserPermissions}${id}?t=${timestamp}`;
+```
+
+This prevents stale permission data from being displayed after updates.
+
+## Common Permission Sets
+
+### Basic User Permissions
+
+Minimum permissions for standard users:
+- `ver_vehiculos` - View vehicle list
+- `ver_clientes` - View clients
+- `ver_reportes` - Access basic reports
+
+### Manager Permissions
+
+Typical permissions for supervisors:
+- All Basic User permissions
+- `crear_vehiculo` - Add new vehicles
+- `editar_vehiculo` - Modify vehicle data
+- `ver_usuarios` - View team members
+- `crear_reporte` - Generate reports
+
+### Admin Permissions
+
+<Warning>
+Admin role users automatically have access to **all features** regardless of individual permission settings. Use the Admin role sparingly.
+</Warning>
+
+Admins typically have:
+- All Manager permissions
+- `gestion_usuarios` - Full user management
+- `asignar_permisos` - Manage permissions
+- `editar_configuraciones` - System settings
+- `ver_paises`, `crear_paises`, `editar_paises` - Location management
+- `ver_ciudades`, `crear_ciudades`, `editar_ciudades` - City management
+
+## Permission Checking in Application
+
+The application uses the `useAuth` hook to check permissions:
+
+```javascript
+const { userData, hasPermiso } = useAuth();
+const isAdmin = userData?.rol?.toLowerCase() === "admin";
+const canEdit = isAdmin || hasPermiso("editar_vehiculo");
+```
+
+**Permission Check Pattern:**
+1. First check if user is Admin (bypass all checks)
+2. If not Admin, check specific permission via `hasPermiso()`
+3. Enable/disable UI elements based on result
+
+## UI States
+
+### Loading State
+
+While fetching permissions:
+- Circular progress indicator displayed
+- Drawer content area shows centered spinner
+- Save button is disabled
+
+### Empty Search State
+
+When search yields no results:
+- Filter icon with "No matches found" message
+- Suggestion to clear or modify search terms
+
+### Error State
+
+If permission loading fails:
+- Error toast notification displayed
+- Message: "Failed to load permissions"
+- Drawer remains open for retry
+
+## Saving Changes
+
+When clicking **Save Changes**:
+
+<Steps>
+  <Step title="Validation">
+    System prepares the list of assigned permission names
+  </Step>
+  
+  <Step title="API Request">
+    Calls `updateUserPermissions(userId, permissionArray)` with payload:
+    ```json
+    {
+      "id_usuario": 123,
+      "permisos": ["ver_vehiculos", "crear_vehiculo", "editar_vehiculo"]
+    }
+    ```
+  </Step>
+  
+  <Step title="Success Handling">
+    - Success toast: "Permissions updated successfully"
+    - Drawer closes automatically
+    - Optional `onUpdateSuccess` callback fired
+  </Step>
+  
+  <Step title="Error Handling">
+    - Error toast: "Failed to save permissions"
+    - Drawer remains open
+    - Changes preserved for retry
+  </Step>
+</Steps>
+
+## Permission Groups Reference
+
+### Vehicles (`Vehiculos`)
+
+| Permission | Description |
+|------------|-------------|
+| `ver_vehiculos` | View vehicle list and details |
+| `crear_vehiculo` | Add new vehicles to the system |
+| `editar_vehiculo` | Modify existing vehicle information |
+| `eliminar_vehiculo` | Delete or archive vehicles |
+| `gestion_vehiculos` | Master permission for all vehicle operations |
+
+### Users (`Usuarios`)
+
+| Permission | Description |
+|------------|-------------|
+| `ver_usuarios` | View user list |
+| `crear_usuario` | Create new user accounts |
+| `editar_usuario` | Modify user information |
+| `eliminar_usuario` | Deactivate user accounts |
+| `restaurar_usuario` | Restore deactivated users |
+| `asignar_permisos` | Manage user permissions |
+| `gestion_usuarios` | Master permission for user management |
+
+### Locations (`Administración`)
+
+| Permission | Description |
+|------------|-------------|
+| `ver_paises` | View countries list |
+| `crear_paises` | Add new countries |
+| `editar_paises` | Modify country information |
+| `eliminar_paises` | Delete countries |
+| `ver_ciudades` | View cities list |
+| `crear_ciudades` | Add new cities |
+| `editar_ciudades` | Modify city information |
+| `eliminar_ciudades` | Delete cities |
+
+### Reports (`Reportes`)
+
+| Permission | Description |
+|------------|-------------|
+| `ver_reportes` | Access reporting interface |
+| `crear_reporte` | Generate new reports |
+| `exportar_reporte` | Export reports to file formats |
+
+### Settings (`Configuraciones`)
+
+| Permission | Description |
+|------------|-------------|
+| `ver_configuraciones` | View system settings |
+| `editar_configuraciones` | Modify system configuration |
+
+## Best Practices
+
+<Note>
+**Permission Assignment Strategy**
+
+1. **Principle of Least Privilege**: Grant only necessary permissions
+2. **Role-Based Templates**: Create standard permission sets for common roles
+3. **Regular Audits**: Review permissions quarterly
+4. **Document Custom Permissions**: Keep notes on non-standard assignments
+5. **Test After Changes**: Verify user can access expected features
+</Note>
+
+<Warning>
+**Security Considerations**
+
+- Never grant `asignar_permisos` to users who shouldn't manage security
+- Review Admin role assignments regularly
+- Use cascading groups to simplify management while maintaining security
+- Monitor permission changes through activity logs
+- Immediately revoke permissions for departing users
+</Warning>
+
+## Troubleshooting
+
+### User Can't Access Feature After Permission Grant
+
+1. Verify permission was saved (check for success toast)
+2. Ask user to log out and log back in
+3. Check if feature requires multiple permissions
+4. Verify user's role doesn't conflict with permission
+
+### Permissions Not Loading
+
+1. Check network connection
+2. Verify user has `asignar_permisos` or Admin role
+3. Check browser console for API errors
+4. Ensure backend permission service is running
+
+### Changes Not Persisting
+
+1. Verify you clicked **Save Changes** button
+2. Check for error toasts during save
+3. Reload permissions drawer to verify
+4. Check backend logs for save failures
+
+## API Reference
+
+### Get User Permissions
+
+```javascript
+getUserPermissions(userId)
+```
+
+Returns permission groups with assigned status for the specified user.
+
+### Update User Permissions
+
+```javascript
+updateUserPermissions(userId, permissionArray)
+```
+
+Updates the permission set for a user.
+
+**Parameters:**
+- `userId` - User ID to update
+- `permissionArray` - Array of permission names (strings)
+
+**Example:**
+```javascript
+await updateUserPermissions(123, [
+  "ver_vehiculos",
+  "crear_vehiculo",
+  "editar_vehiculo"
+]);
+```
+
+## Related Pages
+
+- [User Management](admin/user-management) - Create and manage users
+- [Settings](admin/settings) - Configure system settings
+- [Locations](admin/locations) - Manage countries and cities

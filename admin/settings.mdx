@@ -1,0 +1,470 @@
+---
+title: Settings
+description: Configure application settings, security, appearance, and preferences in AutoLog
+icon: settings
+---
+
+The Settings interface provides comprehensive control over application behavior, user preferences, security features, and system configuration.
+
+## Overview
+
+Settings are organized into sections accessible through a sidebar navigation (`/pages/Settings/SettingsPage.jsx`). Each section manages specific aspects of the application:
+
+- **Home** - Quick access to frequently used settings
+- **Security** - 2FA, sessions, and activity logs
+- **Appearance** - Theme and visual customization
+- **Language & Region** - Localization and formatting
+- **Accessibility** - Accessibility features
+- **About** - System information and version
+
+## Architecture
+
+Settings use a context-based architecture with optimistic updates:
+
+```javascript
+const { settings, loading, saveSection, savingMap, reload } = useSettings();
+```
+
+**Key Features:**
+- Lazy-loaded sections for performance
+- Optimistic UI updates with automatic rollback on error
+- Section-based saves (partial updates)
+- Real-time synchronization with backend
+
+## Security Settings
+
+### Two-Factor Authentication (2FA)
+
+Enable 2FA to add an extra layer of account security.
+
+<Steps>
+  <Step title="Enable 2FA Toggle">
+    Turn on the **Two-Factor Authentication** switch
+  </Step>
+  
+  <Step title="Scan QR Code">
+    A modal opens displaying:
+    - QR code for authenticator apps (Google Authenticator, Authy, etc.)
+    - Manual entry code as backup
+  </Step>
+  
+  <Step title="Verify Setup">
+    Enter the 6-digit code from your authenticator app to confirm setup
+  </Step>
+  
+  <Step title="Save Backup Codes">
+    Store backup codes in a secure location for account recovery
+  </Step>
+</Steps>
+
+**2FA Workflow:**
+
+```javascript
+// Enrollment initiation
+await onSave({ tfa_enroll_init: true });
+// Returns: { qr_image: "data:image/png;base64,...", secret: "XXXXX" }
+
+// Verification
+await onSave({
+  tfa_enroll_verify: true,
+  token: "123456",
+  secret: setupData.secret
+});
+```
+
+<Warning>
+Once 2FA is enabled, you'll need your authenticator app to log in. Keep backup codes safe to avoid account lockout.
+</Warning>
+
+### Login Alerts
+
+Enable email notifications when your account is accessed from a new device:
+
+<ParamField path="login_alerts" type="boolean">
+  Send email alerts for new login sessions
+</ParamField>
+
+When enabled, you receive notifications including:
+- Device information
+- IP address
+- Location (if available)
+- Timestamp
+
+### Active Sessions
+
+View and manage all active login sessions across devices.
+
+**Session Information Displayed:**
+- Device type (laptop/mobile) with icon
+- Device name and browser
+- IP address
+- Last active timestamp
+- Current session indicator
+
+**Managing Sessions:**
+
+To revoke all other sessions (except current):
+
+1. Scroll to Active Sessions section
+2. Click **Revoke All Other Sessions** button
+3. Confirm the action
+
+This immediately logs out all other devices using:
+
+```javascript
+await revokeOtherSessions();
+```
+
+<Note>
+This feature is useful if you suspect unauthorized access or left yourself logged in on a public computer.
+</Note>
+
+### Activity Logs
+
+View recent account activity in a scrollable table:
+
+| Column | Description |
+|--------|-------------|
+| Action | What was performed (e.g., "Login", "Password Changed") |
+| Device | Device information or IP address |
+| Date | When the action occurred |
+
+Logs are displayed in reverse chronological order (most recent first). The table shows up to 300px of scrollable content.
+
+**Loading States:**
+- Skeleton placeholders during data fetch
+- "No recent activity" message if empty
+
+## Appearance Settings
+
+Customize the visual appearance of the application:
+
+<ParamField path="theme" type="select">
+  Choose between Light, Dark, or System (follows OS preference)
+</ParamField>
+
+<ParamField path="colorScheme" type="select">
+  Primary color scheme for the interface
+</ParamField>
+
+<ParamField path="density" type="select">
+  UI density: Comfortable, Compact, or Spacious
+</ParamField>
+
+<ParamField path="fontSize" type="select">
+  Base font size: Small, Medium, or Large
+</ParamField>
+
+## Language & Region Settings
+
+Configure localization and formatting preferences:
+
+<ParamField path="language" type="select" required>
+  Interface language (e.g., "es-HN" for Spanish Honduras, "en-US" for English)
+</ParamField>
+
+<ParamField path="timezone" type="select">
+  Timezone for timestamp display (default: "America/Tegucigalpa")
+</ParamField>
+
+<ParamField path="dateFormat" type="select">
+  Date format:
+  - `DD/MM/YYYY` (31/12/2023)
+  - `MM/DD/YYYY` (12/31/2023)
+  - `YYYY-MM-DD` (2023-12-31)
+</ParamField>
+
+<ParamField path="timeFormat" type="select">
+  Time format:
+  - `12h` (3:00 PM)
+  - `24h` (15:00)
+</ParamField>
+
+**Language Synchronization:**
+
+When language is changed, the interface updates immediately:
+
+```javascript
+useEffect(() => {
+  if (settings?.language && settings.language !== i18n.language) {
+    i18n.changeLanguage(settings.language);
+  }
+}, [settings, i18n]);
+```
+
+No page reload is required.
+
+## Accessibility Settings
+
+Enhance usability for users with specific needs:
+
+<ParamField path="highContrast" type="boolean">
+  Enable high contrast mode for better visibility
+</ParamField>
+
+<ParamField path="reduceMotion" type="boolean">
+  Minimize animations and transitions
+</ParamField>
+
+<ParamField path="screenReaderOptimized" type="boolean">
+  Optimize interface for screen readers
+</ParamField>
+
+<ParamField path="keyboardNavigation" type="boolean">
+  Enhanced keyboard navigation support
+</ParamField>
+
+## Settings Context API
+
+The `SettingsContext` provides a powerful API for managing settings:
+
+### Using Settings Context
+
+```javascript
+import { useSettings } from '@/context/SettingsContext';
+
+function MyComponent() {
+  const { settings, loading, saveSection, savingMap, reload } = useSettings();
+  
+  // Access nested settings
+  const userTheme = settings?.apariencia?.theme || 'light';
+  
+  // Save a section
+  const handleSave = async () => {
+    await saveSection('apariencia', { theme: 'dark' });
+  };
+}
+```
+
+### Context Properties
+
+<ParamField path="settings" type="object">
+  Complete settings object with all sections
+</ParamField>
+
+<ParamField path="loading" type="boolean">
+  True while initial settings are being loaded
+</ParamField>
+
+<ParamField path="saveSection" type="function">
+  Function to save a specific settings section:
+  ```javascript
+  saveSection(sectionKey: string, partialPayload: object)
+  ```
+</ParamField>
+
+<ParamField path="savingMap" type="object">
+  Object tracking save state per section:
+  ```javascript
+  { seguridad: false, apariencia: true }
+  ```
+</ParamField>
+
+<ParamField path="reload" type="function">
+  Force reload all settings from server
+</ParamField>
+
+### Saving Settings
+
+Settings are saved using section-based partial updates:
+
+```javascript
+// Save only changed fields in a section
+await saveSection('seguridad', {
+  tfa_enabled: true,
+  login_alerts: false
+});
+```
+
+**Save Process:**
+
+<Steps>
+  <Step title="Optimistic Update">
+    UI immediately reflects the change for instant feedback
+  </Step>
+  
+  <Step title="API Request">
+    `PATCH /settings/seguridad` with partial payload
+  </Step>
+  
+  <Step title="Server Response">
+    Backend returns updated section data
+  </Step>
+  
+  <Step title="Synchronization">
+    Context updates with server data or rolls back on error
+  </Step>
+</Steps>
+
+### Deep Merge Strategy
+
+Settings use a custom deep merge for nested updates:
+
+```javascript
+function deepMerge(target = {}, patch = {}) {
+  // Recursively merges patch into target without mutation
+  // Handles nested objects while preserving array values
+}
+```
+
+This allows partial updates to nested settings:
+
+```javascript
+// Only updates theme, preserves other appearance settings
+await saveSection('apariencia', { theme: 'dark' });
+```
+
+## Settings Service API
+
+### Get All Settings
+
+```javascript
+const settings = await SettingsService.getAllSettings();
+```
+
+Returns complete settings object with all sections.
+
+### Get Single Section
+
+```javascript
+const security = await SettingsService.getSection('seguridad');
+```
+
+Returns data for a specific section.
+
+### Update Section
+
+```javascript
+const result = await SettingsService.patchSection('seguridad', {
+  tfa_enabled: true
+});
+```
+
+Performs partial update on a section.
+
+### Get Security Data
+
+```javascript
+const { sessions, logs } = await SettingsService.getSecurityData();
+```
+
+Fetches active sessions and activity logs in parallel.
+
+### Revoke Sessions
+
+```javascript
+await SettingsService.revokeOtherSessions();
+```
+
+Closes all sessions except the current one.
+
+## Section Configuration
+
+Settings sections are lazy-loaded for optimal performance:
+
+```javascript
+const Sections = {
+  inicio: React.lazy(() => import('./sections/Inicio.jsx')),
+  seguridad: React.lazy(() => import('./sections/Seguridad.jsx')),
+  apariencia: React.lazy(() => import('./sections/Apariencia.jsx')),
+  idioma: React.lazy(() => import('./sections/IdiomaRegion.jsx')),
+  accesibilidad: React.lazy(() => import('./sections/Accesibilidad.jsx')),
+  acerca: React.lazy(() => import('./sections/Acerca.jsx')),
+};
+```
+
+**Preloading on Hover:**
+
+Sections are preloaded when hovering over navigation items:
+
+```javascript
+onMouseEnter={() => lazyLoaders[item.key]?.()}
+```
+
+This provides instant navigation while keeping initial load small.
+
+## Permission Requirements
+
+Some settings require specific permissions:
+
+| Setting | Required Permission |
+|---------|--------------------|
+| Edit any setting | `editar_configuraciones` or Admin role |
+| View settings | All authenticated users |
+
+## Error Handling
+
+### Save Failures
+
+When a save fails:
+1. Optimistic changes are rolled back
+2. Error toast is displayed
+3. Previous state is restored
+4. User can retry the save
+
+### Load Failures
+
+If settings fail to load:
+1. Error message is logged to console
+2. Default values are used
+3. User can manually trigger reload
+
+## Best Practices
+
+<Note>
+**Settings Management Tips**
+
+1. **Test Theme Changes**: Preview in different lighting conditions
+2. **Document Custom Settings**: Keep notes on non-default configurations
+3. **Regular Backups**: Export settings before major changes
+4. **Session Management**: Revoke sessions periodically for security
+5. **Activity Monitoring**: Review logs regularly for suspicious activity
+</Note>
+
+<Warning>
+**Security Best Practices**
+
+- Enable 2FA for all admin accounts
+- Review active sessions weekly
+- Enable login alerts for critical accounts
+- Use strong, unique passwords
+- Keep backup codes in a secure location (password manager or safe)
+- Immediately revoke sessions if device is lost or stolen
+</Warning>
+
+## Troubleshooting
+
+### Settings Not Saving
+
+1. Check network connection
+2. Verify you have `editar_configuraciones` permission
+3. Look for error toasts with specific messages
+4. Check browser console for API errors
+5. Try refreshing the page and reapplying changes
+
+### 2FA Setup Issues
+
+1. Ensure time is synchronized on your device
+2. Try manual code entry instead of QR scan
+3. Use a compatible authenticator app
+4. Contact support if verification repeatedly fails
+
+### Language Not Changing
+
+1. Verify language pack is available
+2. Clear browser cache
+3. Check if translation files are loaded (console)
+4. Reload the page if change doesn't apply immediately
+
+### Session Revocation Not Working
+
+1. Verify you're not trying to revoke the current session
+2. Check if other sessions are actually active
+3. Wait a moment and refresh the sessions list
+4. Verify API endpoint is accessible
+
+## Related Pages
+
+- [User Management](admin/user-management) - Manage user accounts
+- [Permissions](admin/permissions) - Configure access control
+- [Locations](admin/locations) - Manage geographic data

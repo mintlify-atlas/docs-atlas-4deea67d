@@ -1,0 +1,521 @@
+---
+title: Reporting & Analytics
+description: Generate comprehensive reports on fleet usage, asset tracking, employee activity, and operational metrics
+---
+
+AutoLog's Reporting module provides powerful analytics and data visualization tools to help you make informed decisions about fleet operations, asset utilization, and resource allocation.
+
+## Overview
+
+The reporting system offers:
+- Pre-built report templates for common scenarios
+- Interactive data visualization
+- Customizable date ranges and filters
+- Export capabilities (Excel, CSV, PDF)
+- Real-time KPI dashboards
+- Historical trend analysis
+
+## Available Reports
+
+AutoLog provides several report categories tailored to different operational needs.
+
+### Operational Reports (Operación)
+
+<CardGroup cols={2}>
+  <Card title="Vehicle Usage Records" icon="chart-bar">
+    **Registros de Uso de Vehículos**
+    
+    Comprehensive log of all vehicle check-outs and returns:
+    - Employee name and email
+    - Vehicle details (plate, make, model)
+    - Check-out and return timestamps
+    - Odometer readings
+    - Purpose/destination
+    - Images (if captured)
+    
+    **Use cases:**
+    - Audit vehicle usage
+    - Track employee trips
+    - Calculate vehicle utilization rates
+  </Card>
+  
+  <Card title="Most Used Vehicles" icon="car">
+    **Vehículos Más Utilizados**
+    
+    Ranking of vehicles by usage frequency:
+    - Total trips per vehicle
+    - Total time in use
+    - Average trip duration
+    - Utilization percentage
+    
+    **Use cases:**
+    - Identify high-demand vehicles
+    - Plan maintenance schedules
+    - Optimize fleet size
+  </Card>
+  
+  <Card title="Location-Based Usage" icon="map-pin">
+    **Registros por Ubicación**
+    
+    Track vehicle activity by parking location:
+    - Trips per location
+    - Most active parking spots
+    - Location utilization trends
+    
+    **Use cases:**
+    - Optimize parking allocation
+    - Regional usage patterns
+    - Facility planning
+  </Card>
+  
+  <Card title="Fuel Consumption" icon="droplet">
+    **Consumo de Combustible por Vehículo**
+    
+    Monitor fuel usage across the fleet:
+    - Fuel consumption per vehicle
+    - Cost analysis
+    - Efficiency metrics
+    - Trend over time
+    
+    **Use cases:**
+    - Cost control
+    - Vehicle efficiency comparison
+    - Budget forecasting
+  </Card>
+</CardGroup>
+
+### Human Resources Reports (Recursos Humanos)
+
+<Card title="Employee Activity" icon="users">
+  **Empleados con Más Actividad**
+  
+  Track employee usage patterns:
+  - Total trips per employee
+  - Vehicles used
+  - Total mileage
+  - Average trip duration
+  - Department breakdown
+  
+  **Use cases:**
+  - Monitor employee mobility
+  - Identify power users
+  - Plan resource allocation
+  - Compliance tracking
+</Card>
+
+<Card title="Employee Mileage" icon="road">
+  **Kilometraje por Empleado**
+  
+  Detailed mileage tracking:
+  - Total kilometers per employee
+  - Trip-by-trip breakdown
+  - Date ranges
+  - Vehicle-specific mileage
+  
+  **Use cases:**
+  - Expense reimbursement
+  - Tax reporting
+  - Activity verification
+</Card>
+
+## Report Categories
+
+```jsx
+// Source: ReportsPage.jsx:33-39
+const CATEGORIES = [
+  "Todos",
+  "Operación",
+  "Inventario",
+  "Comercial",
+  "Recursos Humanos",
+];
+```
+
+**Category descriptions:**
+
+| Category | Focus Area | Example Reports |
+|----------|------------|----------------|
+| **Operación** | Fleet operations | Vehicle usage, fuel, locations |
+| **Inventario** | Asset tracking | Asset movements, warehouse status |
+| **Comercial** | Client relationships | Client deployments, contracts |
+| **Recursos Humanos** | Employee data | Employee activity, assignments |
+
+## Report Interface
+
+### Search and Discovery
+
+Find reports quickly with multiple navigation methods:
+
+<Tabs>
+  <Tab title="Search Bar">
+    Instant search across:
+    - Report titles
+    - Report descriptions
+    - Tags
+    
+    ```jsx
+    // Source: ReportsPage.jsx:134-145
+    const filtered = useMemo(() => {
+      const q = query.trim().toLowerCase();
+      return REPORTS.filter((r) => {
+        const matchQ =
+          !q ||
+          r.title.toLowerCase().includes(q) ||
+          r.description.toLowerCase().includes(q) ||
+          r.tags.some((t) => t.toLowerCase().includes(q));
+        const matchC = category === "Todos" || r.category === category;
+        const matchTag = !tag || r.tags.includes(tag);
+        return matchQ && matchC && matchTag;
+      });
+    }, [query, category, tag, REPORTS]);
+    ```
+  </Tab>
+  
+  <Tab title="Category Chips">
+    Horizontal scrollable category filters:
+    - Todos (All)
+    - Operación
+    - Inventario
+    - Comercial
+    - Recursos Humanos
+    
+    **Visual feedback:**
+    - Selected: Solid primary color
+    - Unselected: Outlined neutral
+    - Hover: Background highlight
+  </Tab>
+  
+  <Tab title="Tag Cloud">
+    Browse by report tags:
+    - vehículos
+    - registros
+    - empleados
+    - actividad
+    - kilometraje
+    - combustible
+    - ubicaciones
+    - ranking
+    
+    **Dynamic tags:** Tags sorted by frequency
+  </Tab>
+</Tabs>
+
+### Recent Reports
+
+Quick access to your most recently viewed reports:
+
+```jsx
+// Source: ReportsPage.jsx:111-117
+const [recentIds, setRecentIds] = useState(() => {
+  try {
+    return JSON.parse(localStorage.getItem("recent_reports") || "[]");
+  } catch {
+    return [];
+  }
+});
+```
+
+**Features:**
+- Stores last 4 viewed reports
+- Persists across sessions (localStorage)
+- Compact card layout
+- Quick access from any page
+- Clear history option
+
+<Note>
+Recent reports only appear on the main reports page when no filters are active.
+</Note>
+
+### Report Cards
+
+Each report displays as an interactive card:
+
+<Accordion title="Desktop Card Layout">
+  **Header:**
+  - Category icon (color-coded)
+  - Action button (arrow icon)
+  
+  **Content:**
+  - Report title (bold)
+  - Description text
+  
+  **Footer:**
+  - Category label (uppercase, primary color)
+  
+  **Interaction:**
+  - Hover: Border color change, shadow, lift effect
+  - Click: Navigate to report view
+</Accordion>
+
+<Accordion title="Recent Card Layout">
+  **Horizontal orientation:**
+  - Circular icon avatar
+  - Report title
+  - Category name
+  
+  **Styling:**
+  - Soft neutral background
+  - Compact for quick scanning
+</Accordion>
+
+## Report Data Services
+
+Backend API services for fetching report data:
+
+```jsx
+// Source: ReportServices.jsx
+
+// Vehicle usage records
+export async function getRegisterReport() {
+  const res = await fetchConToken(endpoints.getRegisterReport);
+  const data = await res.json();
+  return res.ok ? data : [];
+}
+
+// Most active employees
+export async function getEmpleadosMasSalidasReport() {
+  const res = await fetchConToken(endpoints.getEmpleadosMasSalidas);
+  const data = await res.json();
+  return res.ok ? data : [];
+}
+
+// Employee mileage
+export async function getKilometrajePorEmpleadoReport() {
+  const res = await fetchConToken(endpoints.getKilometrajePorEmpleado);
+  const data = await res.json();
+  return res.ok ? data : [];
+}
+
+// Most used vehicles
+export async function getVehiculosMasUtilizadosReport() {
+  const res = await fetchConToken(endpoints.getVehiculosMasUtilizados);
+  const data = await res.json();
+  return res.ok ? data : [];
+}
+
+// Location-based registrations
+export async function getRegistrosPorUbicacionReport() {
+  const res = await fetchConToken(endpoints.getRegistrosPorUbicacion);
+  const data = await res.json();
+  return res.ok ? data : [];
+}
+
+// Fuel consumption by vehicle
+export async function getConsumoCombustibleVehiculoReport() {
+  const res = await fetchConToken(endpoints.getConsumoCombustibleVehiculo);
+  const data = await res.json();
+  return res.ok ? data : [];
+}
+```
+
+## Dashboard KPIs
+
+Real-time key performance indicators provide at-a-glance insights:
+
+### Fleet KPIs
+
+<CardGroup cols={3}>
+  <Card title="Total Employees" icon="users">
+    ```jsx
+    export async function getTotalEmpleados() {
+      const res = await fetchConToken(endpoints.getTotalEmpleados);
+      const data = await res.json();
+      return res.ok ? data : { total: 0 };
+    }
+    ```
+  </Card>
+  
+  <Card title="Total Vehicles" icon="car">
+    ```jsx
+    export async function getTotalVehiculos() {
+      const res = await fetchConToken(endpoints.getTotalVehiculos);
+      const data = await res.json();
+      return res.ok ? data : { total: 0 };
+    }
+    ```
+  </Card>
+  
+  <Card title="Vehicles In Use" icon="activity">
+    ```jsx
+    export async function getVehiculosEnUso() {
+      const res = await fetchConToken(endpoints.getVehiculosEnUso);
+      const data = await res.json();
+      return res.ok ? data : { total: 0 };
+    }
+    ```
+  </Card>
+</CardGroup>
+
+<Card title="Vehicles in Maintenance" icon="wrench">
+  ```jsx
+  export async function getVehiculosEnMantenimiento() {
+    const res = await fetchConToken(endpoints.getVehiculosEnMantenimiento);
+    const data = await res.json();
+    return res.ok ? data : { total: 0 };
+  }
+  ```
+  
+  Track vehicles currently unavailable due to maintenance.
+</Card>
+
+## Export Options
+
+All reports support multiple export formats for data analysis and archiving.
+
+### Available Formats
+
+<Tabs>
+  <Tab title="Excel (.xlsx)">
+    **Features:**
+    - Formatted cells with colors
+    - Column auto-sizing
+    - Freeze header row
+    - Sortable columns
+    - Formula support
+    
+    **Best for:**
+    - Further analysis in Excel
+    - Creating charts
+    - Data manipulation
+  </Tab>
+  
+  <Tab title="CSV (.csv)">
+    **Features:**
+    - Universal compatibility
+    - Lightweight file size
+    - Easy import to databases
+    - Plain text format
+    
+    **Best for:**
+    - Data imports
+    - Legacy systems
+    - Automated processing
+  </Tab>
+  
+  <Tab title="PDF (.pdf)">
+    **Features:**
+    - Print-ready formatting
+    - Embedded charts/graphs
+    - Company branding
+    - Fixed layout
+    
+    **Best for:**
+    - Presentations
+    - Archiving
+    - Sharing with stakeholders
+  </Tab>
+</Tabs>
+
+### Export Workflow
+
+<Steps>
+  <Step title="Select Report">
+    Navigate to the desired report view
+  </Step>
+  
+  <Step title="Apply Filters">
+    Configure:
+    - Date range
+    - Specific vehicles/employees
+    - Status filters
+    - Location filters
+  </Step>
+  
+  <Step title="Choose Format">
+    Click **Export** and select format:
+    - Excel for analysis
+    - CSV for import
+    - PDF for printing
+  </Step>
+  
+  <Step title="Download">
+    File downloads automatically with descriptive name:
+    - Format: `reportname_YYYY-MM-DD.ext`
+    - Example: `vehiculos_uso_2026-03-03.xlsx`
+  </Step>
+</Steps>
+
+## Report URL Structure
+
+Reports use clean URL parameters for sharing and bookmarking:
+
+```jsx
+// Source: ReportsPage.jsx:120-130
+useEffect(() => {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (category && category !== "Todos") params.set("cat", category);
+  if (tag) params.set("tag", tag);
+  const s = params.toString();
+  window.history.replaceState(
+    null,
+    "",
+    s ? `/admin/reports?${s}` : "/admin/reports"
+  );
+}, [query, category, tag]);
+```
+
+**URL Parameters:**
+- `?q=search_term` - Search query
+- `?cat=Operación` - Category filter
+- `?tag=vehiculos` - Tag filter
+- `?view=report-id` - Direct report view
+
+**Example URLs:**
+```
+/admin/reports?cat=Operación&tag=vehiculos
+/admin/reports?q=kilometraje
+/admin/reports?view=registros-uso
+```
+
+## Best Practices
+
+<Accordion title="Report Scheduling">
+  - Run large reports during off-peak hours
+  - Export data regularly for backup
+  - Set up automated report delivery (future feature)
+  - Archive old reports systematically
+</Accordion>
+
+<Accordion title="Data Analysis">
+  - Use consistent date ranges for comparison
+  - Filter outliers for accurate trends
+  - Combine multiple reports for insights
+  - Document any data anomalies
+</Accordion>
+
+<Accordion title="Performance">
+  - Limit date ranges for faster loading
+  - Use filters to reduce dataset size
+  - Export filtered data instead of full datasets
+  - Clear browser cache if reports load slowly
+</Accordion>
+
+<Accordion title="Sharing Reports">
+  - Export to PDF for stakeholder distribution
+  - Use Excel for collaborative analysis
+  - Share report URLs for live data
+  - Redact sensitive information when necessary
+</Accordion>
+
+## Permissions
+
+Report access is controlled by permissions:
+
+| Report Type | Permission Required |
+|-------------|--------------------|
+| Vehicle reports | `ver_reportes_vehiculos` |
+| Employee reports | `ver_reportes_empleados` |
+| Asset reports | `ver_reportes_activos` |
+| Client reports | `ver_reportes_clientes` |
+| All reports | `gestionar_reportes` (admin) |
+
+<Warning>
+Sensitive reports (employee activity, mileage) require additional HR permissions. Contact your administrator if you need access.
+</Warning>
+
+## Related Resources
+
+- [Fleet Management](features/fleet-management) - Vehicle usage data source
+- [Asset Tracking](features/asset-tracking) - Asset movement reports
+- [Client Management](features/client-management) - Client activity reports

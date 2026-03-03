@@ -1,0 +1,321 @@
+---
+title: Vehicle Operations
+description: Complete guide to managing vehicles, QR codes, and tracking fleet status in AutoLog
+---
+
+## Overview
+
+The Vehicle Operations module is the core of AutoLog's fleet management system. It allows you to manage your vehicle catalog, generate QR codes for quick registration, and track vehicle status in real-time.
+
+## Vehicle List View
+
+### Accessing Vehicles
+
+Navigate to the Vehicles section from the main menu. You'll see a comprehensive table of all registered vehicles with:
+
+- License plate (placa)
+- Make and model
+- Current location
+- Vehicle status
+- Quick action buttons
+
+### Search and Filter
+
+<Steps>
+  <Step title="Search Vehicles">
+    Use the search bar at the top to find vehicles by:
+    - License plate
+    - Make
+    - Model
+    - Location name
+    
+    The search is instant and supports partial matches.
+  </Step>
+  
+  <Step title="Filter by Status">
+    Toggle "Show Inactive" to include or exclude inactive vehicles from the list.
+    
+    <Info>
+      Inactive vehicles are those marked as out of service, in maintenance, or decommissioned.
+    </Info>
+  </Step>
+  
+  <Step title="View Details">
+    Click on any vehicle row to see complete details, or use the action buttons for specific operations.
+  </Step>
+</Steps>
+
+## Adding a New Vehicle
+
+<Note>
+  You need the `crear_vehiculo` permission to add vehicles. If you don't see the "Add Vehicle" button, contact your administrator.
+</Note>
+
+<Steps>
+  <Step title="Open Creation Form">
+    Click the "Add Vehicle" button in the top-right corner of the vehicle list.
+  </Step>
+  
+  <Step title="Fill Vehicle Information">
+    Required fields:
+    - **License Plate (Placa)**: Unique identifier
+    - **Make (Marca)**: Vehicle manufacturer
+    - **Model (Modelo)**: Vehicle model
+    - **Year**: Manufacturing year
+    - **Current Location**: Where the vehicle is stationed
+    
+    Optional fields:
+    - Color
+    - VIN (Vehicle Identification Number)
+    - Capacity
+    - Additional notes
+  </Step>
+  
+  <Step title="Submit and Confirm">
+    Click "Save" to create the vehicle. You'll see a success notification, and the new vehicle will appear in the list.
+  </Step>
+</Steps>
+
+## Editing Vehicle Information
+
+To update vehicle details:
+
+1. Find the vehicle in the list
+2. Click the edit icon (pencil) in the actions column
+3. Modify the necessary fields
+4. Click "Save" to apply changes
+
+<Warning>
+  Changing the license plate will affect all historical records. Consider creating a new vehicle entry if the plate has changed permanently.
+</Warning>
+
+## Vehicle Status Management
+
+### Available Statuses
+
+- **Disponible (Available)**: Ready for use
+- **En Uso (In Use)**: Currently assigned to an employee
+- **Mantenimiento (Maintenance)**: Under repair or servicing
+- **Inactivo (Inactive)**: Out of service
+
+### Changing Vehicle Status
+
+Status changes happen automatically in most cases:
+- Checking out a vehicle sets it to "En Uso"
+- Returning a vehicle sets it to "Disponible"
+- Manual status changes require administrator permissions
+
+## QR Code Generation
+
+AutoLog's QR code system enables fast, mobile-friendly vehicle registration.
+
+### Generating a QR Code
+
+<Steps>
+  <Step title="Access QR Function">
+    In the vehicle list, click the QR code icon next to the vehicle you want to generate a code for.
+    
+    <Note>
+      Requires `crear_QR` permission.
+    </Note>
+  </Step>
+  
+  <Step title="View Generated Code">
+    A modal will appear showing:
+    - Vehicle information (plate, make, model)
+    - QR code image
+    - Registration link
+  </Step>
+  
+  <Step title="Download or Use">
+    Options:
+    - **Download PNG**: Save the QR code image for printing/sharing
+    - **Test Link**: Open the registration form directly
+    - **Copy Link**: Share the URL for manual access
+  </Step>
+</Steps>
+
+### How QR Codes Work
+
+When scanned, the QR code:
+1. Opens the AutoLog registration form
+2. Pre-fills the vehicle information
+3. Allows the employee to quickly check out or return the vehicle
+4. Includes the vehicle's unique identifier in the URL
+
+<Tip>
+  Print QR codes and place them on vehicle windshields or inside the driver's door for easy access.
+</Tip>
+
+### QR Code Smart Detection
+
+When you test a QR link, AutoLog checks if the vehicle is already in use:
+
+**Scenario 1: Vehicle Available**
+- The registration form opens normally
+- Employee can check out the vehicle
+
+**Scenario 2: Vehicle In Use by You**
+- System detects you already have this vehicle
+- Automatically redirects to the return form
+- Pre-fills your active registration
+
+**Scenario 3: Vehicle In Use by Someone Else**
+- Shows an information dialog with:
+  - Current user's name and email
+  - Check-out timestamp
+- Options:
+  - **OK**: Close and wait
+  - **Notify User**: Send an email reminder to return the vehicle
+  - **Cancel**: Exit
+
+<Info>
+  The notification feature sends a professional email asking the employee to complete their vehicle return if possible.
+</Info>
+
+## Vehicle Actions
+
+### Deactivating a Vehicle
+
+To temporarily or permanently disable a vehicle:
+
+<Steps>
+  <Step title="Initiate Deactivation">
+    Click the disable/trash icon for the vehicle.
+  </Step>
+  
+  <Step title="Confirm Action">
+    A confirmation dialog appears. Review the details and click "Yes, Disable."
+  </Step>
+  
+  <Step title="Verify Status">
+    The vehicle status changes to "Inactivo." It remains in the database but is hidden from normal operations.
+  </Step>
+</Steps>
+
+<Warning>
+  Inactive vehicles cannot be checked out. Complete any pending registrations before deactivating.
+</Warning>
+
+### Restoring a Vehicle
+
+To reactivate an inactive vehicle:
+
+1. Enable "Show Inactive" filter
+2. Find the inactive vehicle in the list
+3. Click the restore icon
+4. Confirm the restoration
+5. Status changes back to "Disponible"
+
+## Location Management
+
+Vehicles are assigned to specific locations (cities/branches). To change a vehicle's location:
+
+1. Edit the vehicle
+2. Select a new location from the dropdown
+3. Save changes
+
+<Note>
+  Locations are managed separately by administrators. If you need a new location added, submit a request to your IT team.
+</Note>
+
+## Permissions and Access Control
+
+Vehicle operations respect role-based permissions:
+
+| Permission | Action |
+|------------|--------|
+| `ver_vehiculos` | View vehicle list |
+| `crear_vehiculo` | Add new vehicles |
+| `editar_vehiculo` | Modify vehicle details |
+| `eliminar_vehiculo` | Deactivate vehicles |
+| `gestionar_vehiculos` | Restore vehicles |
+| `crear_QR` | Generate QR codes |
+
+<Tip>
+  If you see a "No Permission" warning when trying an action, contact your supervisor to request the appropriate role assignment.
+</Tip>
+
+## Advanced Features
+
+### Bulk Operations
+
+Administrators can perform bulk operations via CSV import/export:
+- Export vehicle list to Excel
+- Update multiple vehicles at once
+- Import new vehicles in batch
+
+### Vehicle History
+
+Click on a vehicle to view:
+- Complete registration history
+- Maintenance records
+- Usage statistics
+- Associated employees
+
+### Focus and Highlighting
+
+When navigating from other modules (like notifications or reports), vehicles can be automatically highlighted:
+- URL parameter: `?focus={vehicle_id}`
+- The relevant vehicle row will be briefly highlighted in yellow
+- The page scrolls automatically to show the vehicle
+
+## Troubleshooting
+
+### Cannot Add Vehicle
+
+**Problem**: "Add Vehicle" button is disabled or missing
+
+**Solutions**:
+- Verify you have `crear_vehiculo` permission
+- Check if you're in "Show Inactive" mode (try toggling it)
+- Reload the page to refresh permissions
+
+### QR Code Not Loading
+
+**Problem**: QR modal shows blank or error
+
+**Solutions**:
+- Check network connection
+- Verify the vehicle has a valid ID
+- Try regenerating the QR code
+- Contact administrator if issue persists
+
+### Vehicle Shows as In Use But Employee Returned It
+
+**Problem**: Status not updated after return
+
+**Solutions**:
+- Check if the return form was completed
+- Verify the registration record in the system
+- Administrator can manually update status
+- Use the "Notify User" feature to remind them to complete return
+
+## Mobile Experience
+
+The vehicle operations interface is fully responsive:
+- Touch-friendly action buttons
+- Optimized search on mobile keyboards
+- QR codes display properly on all screen sizes
+- Swipe gestures for table scrolling
+
+## Related Modules
+
+- [Dashboard](dashboard): View fleet statistics
+- [Reservations](reservations): Schedule future vehicle use
+- [Reports](reports): Analyze vehicle usage patterns
+
+## Technical Reference
+
+**Source Files**:
+- Main component: `src/pages/Vehiculos/Vehiculos.jsx`
+- Services: `src/services/VehiculosService.js`
+- Notification service: `src/services/MailServices.js`
+
+**Key Functions**:
+- `obtenerVehiculos()`: Fetch all vehicles (line 94)
+- `deleteVehiculo(id)`: Deactivate vehicle (line 173)
+- `restoreVehiculo(id)`: Reactivate vehicle (line 220)
+- `actualizarVehiculo(id, data)`: Update vehicle (line 257)
+- `getRegistroLinkForVehiculo(id)`: Generate QR link (line 315)
+- `obtenerRegistroPendientePorVehiculo(id)`: Check if vehicle in use (line 330)

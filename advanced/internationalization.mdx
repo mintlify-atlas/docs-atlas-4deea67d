@@ -1,0 +1,281 @@
+---
+title: Internationalization (i18n)
+description: Implement multi-language support with Spanish and English translations
+icon: globe
+---
+
+AutoLog includes built-in internationalization support for Spanish and English using **react-i18next**. The system automatically detects the user's browser language and persists their language preference.
+
+## Language Support
+
+AutoLog supports the following languages:
+
+- **Spanish (es-HN)** - Default language
+- **English (en-US)** - Secondary language
+
+## Implementation
+
+### i18n Configuration
+
+The i18n system is configured in `src/config/i18n.js`:
+
+```javascript src/config/i18n.js
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+
+import es from "../locales/es/translation.json";
+import en from "../locales/en/translation.json";
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources: {
+      "es-HN": { translation: es },
+      "en-US": { translation: en },
+      es: { translation: es },
+      en: { translation: en },
+    },
+    fallbackLng: "es-HN",
+    detection: {
+      order: ["localStorage", "navigator"],
+      caches: ["localStorage"],
+    },
+    interpolation: {
+      escapeValue: false,
+    },
+  });
+```
+
+### Translation Files
+
+Translation files are located in `src/locales/` directory:
+
+```
+src/locales/
+├── es/
+│   └── translation.json
+└── en/
+    └── translation.json
+```
+
+## Using Translations
+
+### Basic Usage
+
+Use the `useTranslation` hook in your components:
+
+```jsx
+import { useTranslation } from "react-i18next";
+
+export default function MyComponent() {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <h1>{t("dashboard.title")}</h1>
+      <p>{t("dashboard.subtitle")}</p>
+    </div>
+  );
+}
+```
+
+### With Variables
+
+Translations support variable interpolation:
+
+```jsx
+const { t } = useTranslation();
+
+// Translation: "Showing {{count}} of {{total}}"
+const message = t("common.showing_results", { count: 10, total: 100 });
+// Result: "Showing 10 of 100"
+```
+
+### Common Translation Keys
+
+Here are frequently used translation keys:
+
+<CodeGroup>
+
+```json Common Actions
+{
+  "common.actions.save": "Guardar / Save",
+  "common.actions.cancel": "Cancelar / Cancel",
+  "common.actions.edit": "Editar / Edit",
+  "common.actions.delete": "Eliminar / Delete",
+  "common.actions.export": "Exportar / Export",
+  "common.actions.import": "Importar / Import"
+}
+```
+
+```json Dashboard
+{
+  "dashboard.title": "Panel de Control / Control Panel",
+  "dashboard.kpi.active_vehicles": "Vehículos en Uso / Active Vehicles",
+  "dashboard.kpi.total_employees": "Personal Total / Total employees"
+}
+```
+
+```json Settings
+{
+  "settings.appearance.title": "Apariencia / Appearance",
+  "settings.appearance.theme.light": "Claro / Light",
+  "settings.appearance.theme.dark": "Oscuro / Dark"
+}
+```
+
+</CodeGroup>
+
+## Switching Languages
+
+### Programmatic Language Switch
+
+To change the language programmatically:
+
+```jsx
+import { useTranslation } from "react-i18next";
+
+export default function LanguageSwitcher() {
+  const { i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
+  return (
+    <div>
+      <button onClick={() => changeLanguage("es")}>Español</button>
+      <button onClick={() => changeLanguage("en")}>English</button>
+    </div>
+  );
+}
+```
+
+### Get Current Language
+
+```jsx
+const { i18n } = useTranslation();
+const currentLanguage = i18n.language; // "es-HN" or "en-US"
+```
+
+## Language Detection
+
+The system detects language in the following order:
+
+<Steps>
+  <Step title="localStorage">
+    Checks for previously saved language preference in browser storage
+  </Step>
+  <Step title="Browser Navigator">
+    Falls back to browser's language setting (`navigator.language`)
+  </Step>
+  <Step title="Fallback">
+    Uses Spanish (es-HN) as the default fallback language
+  </Step>
+</Steps>
+
+## Adding New Translations
+
+To add new translation keys:
+
+<Steps>
+  <Step title="Add to Spanish Translation">
+    Edit `src/locales/es/translation.json`:
+    ```json
+    {
+      "myFeature": {
+        "title": "Mi Nueva Función",
+        "description": "Descripción de la función"
+      }
+    }
+    ```
+  </Step>
+  <Step title="Add to English Translation">
+    Edit `src/locales/en/translation.json`:
+    ```json
+    {
+      "myFeature": {
+        "title": "My New Feature",
+        "description": "Feature description"
+      }
+    }
+    ```
+  </Step>
+  <Step title="Use in Component">
+    ```jsx
+    const { t } = useTranslation();
+    return <h1>{t("myFeature.title")}</h1>;
+    ```
+  </Step>
+</Steps>
+
+## Translation Structure
+
+Translations are organized by feature area:
+
+```json
+{
+  "common": {
+    "loading": "Cargando...",
+    "actions": { ... },
+    "status": { ... }
+  },
+  "home": { ... },
+  "menu": { ... },
+  "dashboard": { ... },
+  "settings": { ... }
+}
+```
+
+<Tip>
+Use nested keys to organize related translations. For example, all button actions are under `common.actions.*`
+</Tip>
+
+## Best Practices
+
+<Note>
+  - Always provide translations for both Spanish and English
+  - Use descriptive key names that reflect the content
+  - Group related translations under common namespaces
+  - Test with both languages enabled
+  - Avoid hardcoded strings in components
+</Note>
+
+## Translation Examples
+
+### Form Labels
+
+```jsx
+const { t } = useTranslation();
+
+return (
+  <FormControl>
+    <FormLabel>{t("form.email")}</FormLabel>
+    <Input placeholder={t("form.email_placeholder")} />
+  </FormControl>
+);
+```
+
+### Error Messages
+
+```jsx
+const { t } = useTranslation();
+
+try {
+  // API call
+} catch (error) {
+  toast.error(t("common.unknown_error"));
+}
+```
+
+### Pluralization
+
+```jsx
+// In translation file:
+// "items_count": "{{count}} item",
+// "items_count_plural": "{{count}} items"
+
+const message = t("items_count", { count: items.length });
+```

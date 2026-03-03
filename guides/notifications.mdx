@@ -1,0 +1,757 @@
+---
+title: Notifications
+description: Configure and manage AutoLog's comprehensive notification system for events, groups, and templates
+---
+
+## Overview
+
+AutoLog's Notification System provides a powerful, event-driven architecture for sending automated emails and alerts. The system consists of three main components: **Events**, **Groups**, and **Templates**.
+
+## System Architecture
+
+### How Notifications Work
+
+<Steps>
+  <Step title="Event Occurs">
+    An action happens in AutoLog (e.g., vehicle checkout, maintenance due)
+  </Step>
+  
+  <Step title="Event Triggers">
+    The system identifies the event type and its severity
+  </Step>
+  
+  <Step title="Groups Identified">
+    Assigned notification groups for this event are located
+  </Step>
+  
+  <Step title="Template Selected">
+    The appropriate template (by event, channel, locale) is chosen
+  </Step>
+  
+  <Step title="Notification Sent">
+    Email/message is composed and sent to all group members
+  </Step>
+</Steps>
+
+<Info>
+  All three components (Events, Groups, Templates) must be properly configured for notifications to work.
+</Info>
+
+## Dashboard Overview
+
+The Notifications Dashboard provides real-time metrics:
+
+### Key Performance Indicators
+
+**Today's Notifications**
+- Total notifications sent today
+- Resets at midnight
+- Useful for monitoring activity volume
+
+**Sent Successfully**
+- Count of delivered notifications
+- High percentage indicates healthy system
+
+**Failed**
+- Notifications that couldn't be delivered
+- Investigate if this number is high
+
+**Suppressed**
+- Messages blocked by filters or user preferences
+- Normal for opt-out compliance
+
+**Average Time**
+- Time from trigger to delivery (in seconds)
+- Lower is better (target: &lt;5 seconds)
+
+<Note>
+  Dashboard metrics update in real-time as notifications are processed.
+</Note>
+
+### Recent Notifications Table
+
+Displays the most recent notification activity:
+
+**Columns**:
+- **ID**: Unique notification identifier
+- **Event**: Which event triggered it
+- **Severity**: Priority level (Low, Medium, High, Critical)
+- **Status**: Delivery state (Delivered, Sent, Failed, Pending, Queued)
+- **Date**: When the notification was sent
+
+**Status Meanings**:
+- **Delivered**: Confirmed received by recipient
+- **Sent**: Handed off to email provider
+- **Failed**: Delivery error occurred
+- **Suppressed**: Blocked by rule or preference
+- **Pending**: Waiting to be processed
+- **Queued**: Scheduled for future sending
+
+<Tip>
+  Click the filter icon to narrow the notification history by event type, status, or date range.
+</Tip>
+
+## Events & Routing
+
+### What are Events?
+
+Events are triggers that cause notifications to be sent. Each event represents a specific action or condition in AutoLog.
+
+**Example events**:
+- `VEHICULO_SALIDA`: Vehicle checked out
+- `VEHICULO_REGRESO`: Vehicle returned
+- `MANTENIMIENTO_PENDIENTE`: Maintenance due
+- `RESERVA_CREADA`: Reservation made
+- `ACTIVO_MOVIDO`: Asset moved
+
+### Event Properties
+
+**Clave (Key)**
+- Unique identifier in UPPERCASE_SNAKE_CASE
+- Used by code to trigger events
+- Cannot be changed after creation
+
+**Nombre (Name)**
+- Human-readable event description
+- Displayed in UI and reports
+
+**Descripción (Description)**
+- Detailed explanation of when event occurs
+- Helps administrators understand purpose
+
+**Severidad por defecto (Default Severity)**
+- Priority level: Low, Medium, High, Critical
+- Can be overridden when event is triggered
+- Affects visual styling and urgency
+
+**Estado (Status)**
+- Active: Event can trigger notifications
+- Inactive: Event is disabled, no notifications sent
+
+**Grupos asignados (Assigned Groups)**
+- Number of notification groups configured to receive this event
+- Click to manage group assignments
+
+### Creating an Event
+
+<Steps>
+  <Step title="Open Event Manager">
+    Navigate to Notifications > Events & Routing
+  </Step>
+  
+  <Step title="Click 'New Event'">
+    Button in top-right of the event list
+  </Step>
+  
+  <Step title="Fill Event Details">
+    - **Clave**: Unique key (e.g., `CUSTOM_EVENT_NAME`)
+    - **Nombre**: Display name
+    - **Descripción**: What triggers this event
+    - **Severidad**: Default priority level
+    - **Activo**: Toggle to enable immediately
+  </Step>
+  
+  <Step title="Save Event">
+    Click "Save" to create the event
+  </Step>
+  
+  <Step title="Assign Groups">
+    After creation, click the Groups icon to assign notification recipients
+  </Step>
+</Steps>
+
+<Warning>
+  Event keys cannot be changed after creation. Choose carefully and follow naming conventions.
+</Warning>
+
+### Editing Events
+
+1. Find the event in the list
+2. Click the edit (pencil) icon
+3. Modify properties (except clave)
+4. Save changes
+
+### Activating/Deactivating Events
+
+Toggle events on/off without deleting:
+
+1. Click the toggle switch icon next to the event
+2. Confirm the status change
+3. Red toggle = Inactive, Green = Active
+
+<Info>
+  Deactivating an event stops all notifications for that event but preserves configuration for future reactivation.
+</Info>
+
+### Assigning Groups to Events
+
+<Steps>
+  <Step title="Open Group Assignment">
+    Click the Users icon in the event's action column
+  </Step>
+  
+  <Step title="Select Groups">
+    A modal shows all available groups:
+    - Checkboxes indicate current assignments
+    - Search to filter groups
+    - Select/deselect as needed
+  </Step>
+  
+  <Step title="Save Assignments">
+    Click "Save" to apply changes
+  </Step>
+</Steps>
+
+<Note>
+  Events can have multiple groups assigned. All members of assigned groups will receive notifications when the event triggers.
+</Note>
+
+### Deleting Events (Soft Delete)
+
+1. Click the trash icon next to the event
+2. Confirm deletion
+3. Event is marked inactive and hidden from normal view
+4. Can be restored by administrators if needed
+
+## Notification Groups
+
+Groups define who receives notifications for specific events.
+
+### Group Structure
+
+**Group Properties**:
+- **Nombre (Name)**: Group identifier
+- **Descripción (Description)**: Purpose of the group
+- **Activo (Active)**: Whether group is enabled
+- **Miembros (Members)**: Users who receive notifications
+- **Canales (Channels)**: Delivery methods enabled
+
+### Creating a Group
+
+<Steps>
+  <Step title="Navigate to Groups">
+    Notifications > Groups tab
+  </Step>
+  
+  <Step title="Click 'New Group'">
+    Opens the group creation form
+  </Step>
+  
+  <Step title="Set Group Details">
+    - **Name**: Descriptive name (e.g., "Fleet Managers", "Maintenance Team")
+    - **Description**: Who should be in this group and why
+    - **Active**: Enable the group
+  </Step>
+  
+  <Step title="Save Group">
+    Click "Save" to create the group
+  </Step>
+  
+  <Step title="Add Members">
+    After creation, add users who should receive notifications
+  </Step>
+</Steps>
+
+### Managing Group Members
+
+<Accordion title="Adding Members">
+  1. Open the group details
+  2. Click "Add Members"
+  3. Search for users by name or email
+  4. Select users to add
+  5. Save changes
+  
+  Members receive notifications for all events assigned to this group.
+</Accordion>
+
+<Accordion title="Removing Members">
+  1. Open the group member list
+  2. Click the remove icon next to the user
+  3. Confirm removal
+  
+  The user stops receiving notifications immediately.
+</Accordion>
+
+### Channel Configuration
+
+Groups can use multiple notification channels:
+
+**Email**
+- Most common channel
+- Sends to user's registered email address
+- Supports HTML templates
+
+**SMS** (if configured)
+- Text message notifications
+- Requires phone numbers in user profiles
+
+**Push** (if configured)
+- In-app push notifications
+- Requires mobile app installation
+
+<Info>
+  To enable additional channels, contact your system administrator. Email is enabled by default.
+</Info>
+
+## Email Templates
+
+Templates define the content and format of notification emails.
+
+### Template Structure
+
+Each template consists of:
+
+**Evento (Event)**
+- Which event this template is for
+- Example: `VEHICULO_SALIDA`
+
+**Canal (Channel)**
+- Delivery method (usually "email")
+
+**Locale**
+- Language code (es, en, etc.)
+- Allows multilingual notifications
+
+**Asunto (Subject)**
+- Email subject line
+- Supports placeholders like `{{empleado_nombre}}`
+
+**Cuerpo (Body)**
+- Email HTML content
+- Full HTML support for rich formatting
+- Uses placeholder syntax for dynamic data
+
+**Metadata**
+- Additional configuration (JSON format)
+- `default_payload`: Default values for placeholders
+- `subject_prefix`: Prefix for all subjects (e.g., "[FLOTA]")
+
+**Estado (Status)**
+- Active: Template can be used
+- Inactive: Template is disabled
+
+**Es default (Is Default)**
+- Whether this is the default template for the event/channel/locale combo
+- Only one template can be default per combination
+
+### Creating a Template
+
+<Steps>
+  <Step title="Open Template Editor">
+    Navigate to Notifications > Templates
+  </Step>
+  
+  <Step title="Click 'New Template'">
+    Opens template creation wizard
+  </Step>
+  
+  <Step title="Specify Template Key">
+    Enter the event clave (e.g., `VEHICULO_SALIDA`)
+  </Step>
+  
+  <Step title="Design Subject">
+    Write the email subject:
+    ```
+    Vehículo {{vehiculo_placa}} ha sido retirado
+    ```
+  </Step>
+  
+  <Step title="Design Body">
+    Create the HTML email body:
+    ```html
+    <p>Hola {{empleado_nombre}},</p>
+    <p>Has retirado el vehículo <strong>{{vehiculo_placa}}</strong> ({{vehiculo_marca}} {{vehiculo_modelo}}).</p>
+    <p>Fecha de salida: {{fecha_salida}}</p>
+    <p>Por favor, devuelve el vehículo al finalizar tu jornada.</p>
+    ```
+  </Step>
+  
+  <Step title="Configure Metadata (Optional)">
+    Add JSON configuration:
+    ```json
+    {
+      "subject_prefix": "[FLOTA] ",
+      "default_payload": {
+        "empresa": "Tecnasa"
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Save Template">
+    Click "Save" to create the template
+  </Step>
+</Steps>
+
+### Using Placeholders
+
+Placeholders are replaced with actual data when notifications are sent:
+
+**Syntax**: `{{variable_name}}`
+
+**Common placeholders**:
+- `{{empleado_nombre}}`: Employee name
+- `{{vehiculo_placa}}`: Vehicle license plate
+- `{{vehiculo_marca}}`: Vehicle make
+- `{{vehiculo_modelo}}`: Vehicle model
+- `{{fecha_salida}}`: Checkout date/time
+- `{{fecha_regreso}}`: Return date/time
+- `{{link_detalle}}`: Link to details
+
+**Nested placeholders**: `{{cliente.nombre}}` for nested objects
+
+<Tip>
+  The template editor automatically detects placeholders in your content and displays them in a chip list for reference.
+</Tip>
+
+### Template Preview
+
+Test your template before using it:
+
+<Steps>
+  <Step title="Enter Test Data">
+    In the "Payload de prueba" section, provide JSON with sample values:
+    ```json
+    {
+      "empleado_nombre": "Juan Pérez",
+      "vehiculo_placa": "HAA-1234",
+      "vehiculo_marca": "Toyota",
+      "vehiculo_modelo": "Corolla",
+      "fecha_salida": "2024-03-15 09:30"
+    }
+    ```
+  </Step>
+  
+  <Step title="Click 'Previsualizar'">
+    System renders the template with your test data
+  </Step>
+  
+  <Step title="Review Output">
+    Check:
+    - Subject line formatting
+    - All placeholders replaced correctly
+    - HTML renders properly
+    - Links work
+  </Step>
+  
+  <Step title="Adjust and Re-preview">
+    Make changes and preview again until satisfied
+  </Step>
+</Steps>
+
+### Local vs Server Preview
+
+Toggle between preview modes:
+
+**Local Preview**
+- Renders in browser using JavaScript
+- Instant results
+- Good for quick checks
+- May not reflect server-side logic exactly
+
+**Server Preview**
+- Renders on server (same as production)
+- Accurate representation
+- Includes metadata processing
+- Slightly slower
+
+<Info>
+  Use server preview for final validation before publishing a template.
+</Info>
+
+### Sending Test Emails
+
+<Steps>
+  <Step title="Configure Test Payload">
+    Ensure your test data is complete and valid JSON
+  </Step>
+  
+  <Step title="Click 'Enviar prueba'">
+    Button in the actions panel
+  </Step>
+  
+  <Step title="Enter Email Address">
+    Provide the recipient email for the test
+  </Step>
+  
+  <Step title="Send">
+    Confirm to send the test email
+  </Step>
+  
+  <Step title="Check Inbox">
+    Verify the email arrived and looks correct
+  </Step>
+</Steps>
+
+<Warning>
+  Test emails use real email infrastructure. Don't send tests to customer email addresses.
+</Warning>
+
+### Publishing Templates
+
+Once a template is ready for production:
+
+1. Click "Publicar como default"
+2. This makes it the active template for the event/channel/locale combination
+3. All notifications for that event will use this template
+
+<Note>
+  Publishing automatically unpublishes the previous default template.
+</Note>
+
+### Template Metadata
+
+Metadata enhances template functionality with JSON configuration:
+
+**subject_prefix**
+```json
+{
+  "subject_prefix": "[AUTOLOG] "
+}
+```
+Adds a prefix to all email subjects automatically.
+
+**default_payload**
+```json
+{
+  "default_payload": {
+    "empresa": "Tecnasa",
+    "soporte_email": "soporte@tecnasa.com"
+  }
+}
+```
+Provides fallback values for placeholders not in the event payload.
+
+**custom_config**
+```json
+{
+  "reply_to": "noreply@example.com",
+  "cc": ["admin@example.com"],
+  "priority": "high"
+}
+```
+Additional email headers and settings.
+
+<Tip>
+  Keep metadata minimal. Only add what's necessary for the template to function.
+</Tip>
+
+## Notification Workflow Example
+
+### Scenario: Vehicle Checkout Notification
+
+<Steps>
+  <Step title="Employee Checks Out Vehicle">
+    User scans QR code or completes checkout form for vehicle HAA-1234
+  </Step>
+  
+  <Step title="System Triggers Event">
+    AutoLog fires `VEHICULO_SALIDA` event with payload:
+    ```json
+    {
+      "empleado_nombre": "Ana García",
+      "empleado_email": "ana@example.com",
+      "vehiculo_placa": "HAA-1234",
+      "vehiculo_marca": "Toyota",
+      "vehiculo_modelo": "Corolla",
+      "fecha_salida": "2024-03-15T09:30:00Z"
+    }
+    ```
+  </Step>
+  
+  <Step title="Groups Retrieved">
+    System finds groups assigned to `VEHICULO_SALIDA`:
+    - "Fleet Supervisors" group
+    - "Vehicle Checkout Recipients" group
+  </Step>
+  
+  <Step title="Template Selected">
+    Gets the default template for:
+    - Event: `VEHICULO_SALIDA`
+    - Channel: `email`
+    - Locale: `es`
+  </Step>
+  
+  <Step title="Email Composed">
+    Template placeholders are replaced:
+    
+    Subject: `[FLOTA] Vehículo HAA-1234 ha sido retirado`
+    
+    Body:
+    ```html
+    <p>Hola Ana García,</p>
+    <p>Has retirado el vehículo <strong>HAA-1234</strong> (Toyota Corolla).</p>
+    <p>Fecha de salida: 15/03/2024 09:30</p>
+    ```
+  </Step>
+  
+  <Step title="Notifications Sent">
+    Emails dispatched to:
+    - Ana García (the employee)
+    - All members of "Fleet Supervisors"
+    - All members of "Vehicle Checkout Recipients"
+  </Step>
+  
+  <Step title="Status Tracked">
+    Each notification is logged with status (Sent, Delivered, etc.)
+  </Step>
+</Steps>
+
+## Permissions and Access
+
+Notification management requires specific permissions:
+
+**View Notifications**
+- See dashboard and history
+- View events, groups, templates (read-only)
+
+**Manage Events**
+- Create, edit, activate/deactivate events
+- Assign groups to events
+
+**Manage Groups**
+- Create and edit groups
+- Add/remove members
+- Configure channels
+
+**Manage Templates**
+- Create and edit templates
+- Publish templates
+- Send test emails
+
+<Warning>
+  Template management is powerful and affects all users. Restrict access to authorized administrators.
+</Warning>
+
+## Best Practices
+
+### Event Management
+
+<Accordion title="Event Best Practices">
+  - Use clear, descriptive event names
+  - Follow naming convention: `RESOURCE_ACTION` (e.g., `VEHICULO_SALIDA`)
+  - Document events thoroughly in descriptions
+  - Set appropriate default severity
+  - Review and deactivate unused events
+</Accordion>
+
+### Group Management
+
+- Keep groups focused (single purpose)
+- Regularly audit membership
+- Remove inactive users promptly
+- Use descriptive group names
+- Document group purpose
+
+### Template Design
+
+- **Keep it simple**: Clear, concise messages
+- **Use branding**: Include logo and colors
+- **Mobile-friendly**: Test on mobile devices
+- **Clear CTAs**: Make actions obvious
+- **Test thoroughly**: Use multiple test payloads
+- **Handle missing data**: Use default values or conditional logic
+
+<Tip>
+  Write email templates at a 6th-grade reading level for maximum clarity.
+</Tip>
+
+## Troubleshooting
+
+### Notifications Not Being Sent
+
+**Checklist**:
+1. Is the event active?
+2. Are groups assigned to the event?
+3. Do groups have active members?
+4. Is the template published as default?
+5. Check notification history for errors
+
+### Email Delivery Issues
+
+**Problem**: Emails sent but not received
+
+**Solutions**:
+- Check spam/junk folders
+- Verify recipient email addresses
+- Confirm email server configuration
+- Review suppression lists
+- Check email service provider logs
+
+### Template Placeholders Not Replaced
+
+**Problem**: Email shows `{{variable_name}}` instead of value
+
+**Solutions**:
+- Verify placeholder name matches payload keys exactly (case-sensitive)
+- Check that event payload includes the variable
+- Use default_payload in metadata for fallbacks
+- Test with known-good payload data
+
+### Preview Shows Different Content Than Production
+
+**Problem**: Server preview differs from actual emails
+
+**Solutions**:
+- Always use server preview for final checks
+- Verify template is published as default
+- Clear template cache (contact administrator)
+- Check if event payload differs from test payload
+
+## Advanced Configuration
+
+### Custom Event Payloads
+
+Developers can trigger events with custom data:
+
+```javascript
+import { triggerNotification } from '@/services/NotificationService';
+
+await triggerNotification({
+  event: 'CUSTOM_EVENT',
+  payload: {
+    user_name: 'John Doe',
+    action: 'completed task',
+    timestamp: new Date().toISOString()
+  },
+  severity: 'medium'
+});
+```
+
+### Conditional Logic in Templates
+
+While not fully implemented, you can simulate conditions:
+
+```html
+{{#if maintenance_required}}
+<p style="color: red;">Maintenance is required!</p>
+{{/if}}
+```
+
+<Note>
+  Advanced template features may require custom implementation. Contact your developer for assistance.
+</Note>
+
+## Related Features
+
+- [Dashboard](dashboard): View notification activity
+- [Vehicle Operations](vehicle-operations): Events triggered by vehicle actions
+- [Reservations](reservations): Reservation-related notifications
+
+## Technical Reference
+
+**Source Files**:
+- Notifications UI: `src/pages/Notificaciones/Notificaciones.jsx`
+- Event services: `src/services/NotificacionesEventosService.js`
+- Group services: `src/services/NotificacionesGruposService.js`
+- Template services: `src/services/NotificacionesPlantillasService.js`
+
+**Key Functions**:
+- `listEventos()`: Fetch all events
+- `createEvento(data)`: Create new event
+- `setEventoGrupos(eventId, groupIds)`: Assign groups
+- `listGrupos()`: Fetch all groups
+- `addMiembros(groupId, userIds)`: Add group members
+- `apiCreatePlantilla(data)`: Create template
+- `apiPreviewPlantilla(config)`: Preview template
+- `apiPublishPlantilla(templateId)`: Publish template as default

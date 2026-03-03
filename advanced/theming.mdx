@@ -1,0 +1,383 @@
+---
+title: Theme Customization
+description: Customize colors, fonts, and appearance settings for AutoLog
+icon: palette
+---
+
+AutoLog provides a comprehensive theming system built on **Material UI Joy** with support for light/dark modes, brand colors, and custom typography.
+
+## Theme Architecture
+
+The theming system consists of:
+
+- **Color Schemes** - Light, Dark, and System modes
+- **Brand Colors** - 10 pre-configured color palettes
+- **Typography** - 4 font options with live preview
+- **Theme Persistence** - Settings saved to localStorage
+
+## Color Schemes
+
+AutoLog supports three color scheme modes:
+
+<CardGroup cols={3}>
+  <Card title="Light Mode" icon="sun">
+    Clean, bright interface optimized for daylight viewing
+  </Card>
+  <Card title="Dark Mode" icon="moon">
+    Reduced eye strain for low-light environments
+  </Card>
+  <Card title="System Mode" icon="laptop">
+    Automatically matches your operating system preference
+  </Card>
+</CardGroup>
+
+### Implementing Color Scheme Toggle
+
+Use the `useColorScheme` hook from Material UI Joy:
+
+```jsx ColorSchemeToggle.jsx
+import { useColorScheme } from "@mui/joy/styles";
+import IconButton from "@mui/joy/IconButton";
+import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
+import LightModeIcon from "@mui/icons-material/LightMode";
+
+export default function ColorSchemeToggle() {
+  const { mode, setMode } = useColorScheme();
+
+  return (
+    <IconButton
+      variant="outlined"
+      color="neutral"
+      onClick={() => {
+        setMode(mode === "light" ? "dark" : "light");
+      }}
+    >
+      {mode === "light" ? <DarkModeRoundedIcon /> : <LightModeIcon />}
+    </IconButton>
+  );
+}
+```
+
+### Mode Detection
+
+```jsx
+import { useColorScheme } from "@mui/joy/styles";
+
+const { mode, systemMode } = useColorScheme();
+// mode: "light" | "dark" | "system"
+// systemMode: actual resolved mode when "system" is selected
+```
+
+## Brand Colors
+
+AutoLog includes 10 professionally designed brand color palettes:
+
+| Brand | Primary Color | Name |
+|-------|--------------|------|
+| Default | `#0B6BCB` | Azul Tecnasa |
+| Indigo | `#6366f1` | Índigo |
+| Forest | `#10b981` | Bosque |
+| Orange | `#f97316` | Naranja |
+| Teams | `#6264A7` | Teams |
+| Rose | `#e11d48` | Rose Red |
+| Purple | `#a855f7` | Deep Purple |
+| Cyan | `#06b6d4` | Cyan Sky |
+| Slate | `#64748b` | Slate Grey |
+| Neon | `#d946ef` | Cyberpunk |
+
+### Theme Context
+
+The `AppThemeProvider` manages theme state:
+
+```jsx AppThemeContext.jsx
+import { createContext, useContext, useState, useEffect } from "react";
+import { CssVarsProvider } from "@mui/joy";
+import { createAppTheme } from "../theme/createAppTheme";
+
+const AppThemeCtx = createContext(null);
+
+export function AppThemeProvider({ children }) {
+  const [brand, setBrand] = useState(getLS("ui:brand", "default"));
+  const [font, setFont] = useState(getLS("ui:font", "Poppins, sans-serif"));
+
+  const theme = useMemo(() => createAppTheme({ brand, font }), [brand, font]);
+
+  return (
+    <AppThemeCtx.Provider value={{ brand, setBrand, font, setFont }}>
+      <CssVarsProvider
+        theme={theme}
+        defaultMode="light"
+        modeStorageKey="ui:mode"
+        disableTransitionOnChange
+      >
+        {children}
+      </CssVarsProvider>
+    </AppThemeCtx.Provider>
+  );
+}
+
+export const useAppTheme = () => useContext(AppThemeCtx);
+```
+
+### Using Custom Brand Colors
+
+```jsx
+import { useAppTheme } from "@/context/AppThemeContext";
+
+export default function BrandColorSelector() {
+  const { brand, setBrand } = useAppTheme();
+
+  return (
+    <select value={brand} onChange={(e) => setBrand(e.target.value)}>
+      <option value="default">Azul Tecnasa</option>
+      <option value="indigo">Índigo</option>
+      <option value="forest">Bosque</option>
+      <option value="orange">Naranja</option>
+    </select>
+  );
+}
+```
+
+## Theme Creation
+
+The `createAppTheme` function generates a Material UI Joy theme:
+
+```javascript createAppTheme.js
+import { extendTheme } from "@mui/joy/styles";
+
+const BRANDS = {
+  default: { primary: "#0B6BCB", name: "Azul Tecnasa" },
+  indigo: { primary: "#6366f1", name: "Índigo" },
+  forest: { primary: "#10b981", name: "Bosque" },
+  // ... more brands
+};
+
+export const createAppTheme = ({ brand = "default", font = "Poppins" }) => {
+  const selectedBrand = BRANDS[brand] || BRANDS.default;
+  const color = selectedBrand.primary;
+
+  return extendTheme({
+    fontFamily: {
+      body: font,
+      display: font,
+      code: "monospace",
+    },
+    colorSchemes: {
+      light: {
+        palette: generatePalette(color),
+      },
+      dark: {
+        palette: generatePalette(color),
+      },
+    },
+  });
+};
+```
+
+## Typography
+
+AutoLog supports 4 font families:
+
+<Steps>
+  <Step title="Poppins (Default)">
+    Modern, geometric sans-serif font with excellent readability
+  </Step>
+  <Step title="Inter">
+    Optimized for user interfaces with precise letter spacing
+  </Step>
+  <Step title="Roboto">
+    Google's Material Design font, clean and professional
+  </Step>
+  <Step title="Fira Code">
+    Monospace font with programming ligatures
+  </Step>
+</Steps>
+
+### Font Configuration
+
+```javascript
+const FONTS = [
+  { value: "Poppins, sans-serif", label: "Poppins" },
+  { value: "Inter, ui-sans-serif, system-ui, sans-serif", label: "Inter" },
+  { value: "Roboto, system-ui, sans-serif", label: "Roboto" },
+  { value: "'Fira Code', monospace", label: "Fira Code" },
+];
+```
+
+### Changing Fonts
+
+```jsx
+import { useAppTheme } from "@/context/AppThemeContext";
+
+export default function FontSelector() {
+  const { font, setFont } = useAppTheme();
+
+  const handleFontChange = async (newFont) => {
+    setFont(newFont);
+    // Font changes require page reload
+    window.location.reload();
+  };
+
+  return (
+    <Select value={font} onChange={(_, value) => handleFontChange(value)}>
+      <Option value="Poppins, sans-serif">Poppins</Option>
+      <Option value="Inter, ui-sans-serif, system-ui, sans-serif">Inter</Option>
+      <Option value="Roboto, system-ui, sans-serif">Roboto</Option>
+    </Select>
+  );
+}
+```
+
+<Note>
+Font changes require a page reload to take effect. This ensures all components properly load the new font family.
+</Note>
+
+## Appearance Settings
+
+The Settings page (`src/pages/Settings/sections/Apariencia.jsx`) provides a UI for customizing appearance:
+
+<CodeGroup>
+
+```jsx Theme Selection
+const { mode, setMode } = useColorScheme();
+const { t } = useTranslation();
+
+const handleModeChange = async (event) => {
+  const newMode = event.target.value;
+  setMode(newMode);
+  await onSave({ mode: newMode });
+};
+
+return (
+  <RadioGroup value={mode || "light"} onChange={handleModeChange}>
+    <Radio value="system" label={t("settings.appearance.theme.system")} />
+    <Radio value="dark" label={t("settings.appearance.theme.dark")} />
+    <Radio value="light" label={t("settings.appearance.theme.light")} />
+  </RadioGroup>
+);
+```
+
+```jsx Brand Color Selection
+const { brand, setBrand } = useAppTheme();
+
+const handleBrandChange = async (newBrand) => {
+  setBrand(newBrand);
+  await onSave({ brand: newBrand });
+};
+
+return (
+  <Stack direction="row" gap={2}>
+    {BRAND_COLORS.map((color) => (
+      <Box
+        key={color.value}
+        onClick={() => handleBrandChange(color.value)}
+        sx={{
+          width: 48,
+          height: 48,
+          borderRadius: "50%",
+          bgcolor: color.hex,
+          cursor: "pointer",
+        }}
+      />
+    ))}
+  </Stack>
+);
+```
+
+</CodeGroup>
+
+## Storage Keys
+
+Theme settings are persisted in localStorage:
+
+| Key | Value | Description |
+|-----|-------|-------------|
+| `ui:mode` | `"light"` \| `"dark"` \| `"system"` | Color scheme mode |
+| `ui:brand` | `"default"` \| `"indigo"` \| ... | Selected brand color |
+| `ui:font` | `"Poppins, sans-serif"` \| ... | Font family |
+
+### Accessing Stored Preferences
+
+```javascript
+const getLS = (key, defaultValue) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ?? defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const setLS = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {}
+};
+
+const currentBrand = getLS("ui:brand", "default");
+const currentMode = getLS("ui:mode", "light");
+```
+
+## Custom CSS Variables
+
+The theme system exposes CSS variables for custom styling:
+
+```css
+:root {
+  --app-font: Poppins, sans-serif;
+  --joy-palette-primary-main: #0B6BCB;
+  --joy-palette-primary-mainChannel: 11 107 203;
+}
+```
+
+### Using CSS Variables
+
+```jsx
+<Box
+  sx={{
+    fontFamily: "var(--app-font)",
+    color: "var(--joy-palette-primary-main)",
+    backgroundColor: "rgba(var(--joy-palette-primary-mainChannel) / 0.15)",
+  }}
+>
+  Themed content
+</Box>
+```
+
+## Dark Mode Synchronization
+
+AutoLog includes a `TailwindDarkSync` component to sync dark mode with Tailwind CSS:
+
+```jsx TailwindDarkSync.jsx
+import { useColorScheme } from "@mui/joy/styles";
+import { useEffect } from "react";
+
+export default function TailwindDarkSync() {
+  const { mode, systemMode } = useColorScheme();
+  const resolvedMode = mode === "system" ? systemMode : mode;
+
+  useEffect(() => {
+    if (resolvedMode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [resolvedMode]);
+
+  return null;
+}
+```
+
+<Tip>
+Include `TailwindDarkSync` inside your theme provider to automatically sync dark mode with Tailwind's dark mode classes.
+</Tip>
+
+## Best Practices
+
+<Note>
+  - Always use theme tokens instead of hardcoded colors
+  - Test your UI in both light and dark modes
+  - Provide fallback values for localStorage access
+  - Use `useColorScheme` for mode-aware components
+  - Reload the page after font changes for consistency
+</Note>

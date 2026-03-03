@@ -1,0 +1,571 @@
+---
+title: Features Overview
+description: Comprehensive guide to all AutoLog features and capabilities
+---
+
+# Features Overview
+
+AutoLog provides a complete suite of tools for fleet management, asset tracking, client management, and reporting. This guide covers all major features and how to use them effectively.
+
+## Fleet Management
+
+<Card title="Vehicle Tracking & Management" icon="car">
+  Complete lifecycle management for your entire fleet with real-time status tracking and QR code generation.
+</Card>
+
+### Vehicle Catalog
+
+Manage your complete vehicle inventory with:
+
+- **Vehicle Details**: License plate, make, model, year, and VIN tracking
+- **Status Tracking**: Real-time status monitoring (Available, In Use, Under Maintenance, Inactive)
+- **Location Assignment**: Associate vehicles with specific parking locations or facilities
+- **Search & Filters**: Quickly find vehicles by plate, make, model, or location
+
+```jsx
+// Example vehicle data structure from Dashboard.jsx
+const vehiculos = [
+  {
+    id: 1,
+    placa: "ABC-1234",
+    marca: "Toyota",
+    modelo: "Hilux",
+    estado: "Disponible", // Available for use
+    LocationID: 5,
+    nombre_ubicacion: "Central Warehouse"
+  }
+]
+```
+
+### Vehicle Registration System
+
+Track vehicle usage with check-in/check-out functionality:
+
+<Steps>
+  <Step title="Check-Out">
+    Employee scans QR code or uses registration form to check out a vehicle. System records:
+    - Employee name and ID
+    - Departure time and date
+    - Initial odometer reading
+    - Initial fuel level
+    - Destination/purpose
+  </Step>
+  <Step title="In Use">
+    Vehicle status automatically updates to "In Use" and appears in dashboard KPIs
+  </Step>
+  <Step title="Check-In">
+    Upon return, employee registers:
+    - Return time and date
+    - Final odometer reading
+    - Final fuel level
+    - Trip notes/observations
+  </Step>
+  <Step title="Analytics">
+    System calculates trip distance, fuel consumption, and duration for reporting
+  </Step>
+</Steps>
+
+### QR Code Generation
+
+<Info>
+Each vehicle can have a unique QR code generated for instant mobile registration, eliminating manual data entry and reducing errors.
+</Info>
+
+Features:
+- Generate printable QR codes with custom company logos
+- Download as PNG for printing or digital distribution
+- QR links direct to mobile-optimized registration forms
+- Automatic vehicle detection prevents incorrect assignments
+
+```javascript
+// From Vehiculos.jsx - QR code generation
+import StyledQR from '@/components/QRCode/StyledQR';
+import logoTecnasa from '@/assets/newLogoTecnasaBlack.png';
+
+<StyledQR
+  ref={qrRef}
+  text={registroLink}
+  logoUrl={logoTecnasa}
+  size={220}
+/>
+```
+
+### Intelligent Vehicle Status Detection
+
+When scanning a QR code for a vehicle already in use:
+
+<Warning>
+**Smart Conflict Detection**: The system detects if a vehicle is already checked out and:
+- Shows who currently has the vehicle
+- Displays departure time and employee contact
+- Offers to notify the current user
+- Redirects current user directly to check-in form if they scan their own QR
+</Warning>
+
+## Asset Tracking & Inventory
+
+<Card title="Comprehensive Asset Management" icon="box">
+  Track equipment, computers, and other assets across your entire organization with complete movement history.
+</Card>
+
+### Asset Database
+
+Maintain a complete inventory with:
+
+- **Unique Identifiers**: Asset codes and serial numbers for precise tracking
+- **Detailed Metadata**: Name, type, model, manufacturer, purchase date
+- **Status Management**: Active, Under Repair, Backup, Retired
+- **Location Tracking**: Current location type (Client, Warehouse, Employee)
+
+### Asset Locations
+
+Assets can be assigned to three destination types:
+
+<CardGroup cols={3}>
+  <Card title="Clients" icon="building">
+    Deploy assets to client sites with full site and client name tracking
+  </Card>
+  <Card title="Warehouses" icon="warehouse">
+    Store assets in company warehouses/storage facilities
+  </Card>
+  <Card title="Employees" icon="user">
+    Assign assets to individual employees for their use
+  </Card>
+</CardGroup>
+
+### Asset Movement History
+
+```jsx
+// Complete movement tracking from ActivosList.jsx
+const asset = {
+  codigo: "LAPTOP-001",
+  nombre: "Dell Latitude 7490",
+  tipo: "Laptop",
+  serial_number: "DL7490-2024-001",
+  estatus: "Activo",
+  tipo_destino: "Cliente",
+  cliente_nombre: "Acme Corporation",
+  site_nombre: "San Pedro Sula Office"
+}
+```
+
+Every asset movement is logged with:
+- Timestamp of movement
+- Origin location (warehouse, client, employee)
+- Destination location
+- User who performed the movement
+- Reason/notes for the transfer
+
+<Tip>
+**Audit Trail**: Access complete movement history for any asset to track its lifecycle and maintain accountability.
+</Tip>
+
+### Advanced Filtering & Search
+
+Find assets instantly with powerful search:
+
+- **Text Search**: Search by code, name, model, or serial number
+- **Status Filters**: Filter by asset status (Active, Repair, Backup)
+- **Type Filters**: Filter by asset type (Laptop, Desktop, Monitor, etc.)
+- **Location Filters**: Show only assets at clients, warehouses, or with employees
+- **Multi-Select**: Apply multiple filters simultaneously
+
+### Bulk Operations
+
+<Steps>
+  <Step title="Bulk Import">
+    Import hundreds of assets at once using Excel templates
+  </Step>
+  <Step title="Mass Export">
+    Export filtered asset lists to Excel, PDF, or CSV
+  </Step>
+  <Step title="Batch Movements">
+    Move multiple assets between locations in one operation
+  </Step>
+</Steps>
+
+### Asset QR Codes
+
+Generate public-facing QR codes for assets:
+
+```javascript
+// Each asset gets a unique public URL
+const publicLink = `${window.location.origin}/public/activos/${asset.codigo}`
+```
+
+- Scan QR to view asset details without logging in
+- Perfect for printing and attaching to physical equipment
+- Shows current location and status
+- Displays asset specifications and history
+
+## Client Management
+
+<Card title="Client Relationship Management" icon="users">
+  Organize clients, sites, contracts, and asset deployments in a unified system.
+</Card>
+
+### Client Database
+
+Manage client information including:
+- Company name and contact details
+- Multiple site locations per client
+- Contract details and service agreements
+- Deployed assets at each site
+
+### Site Management
+
+Track individual client locations:
+
+```javascript
+// Example client site structure
+const clientSite = {
+  id: 1,
+  client_id: 42,
+  cliente_nombre: "Acme Corporation",
+  site_nombre: "San Pedro Sula Office",
+  direccion: "Blvd. del Norte, Col. Los Andes",
+  ciudad: "San Pedro Sula",
+  pais: "Honduras",
+  contacto: "Juan Pérez",
+  telefono: "+504 2550-1234"
+}
+```
+
+### Client Asset Tracking
+
+View all assets deployed to each client:
+- Filter assets by client and site
+- See asset status and condition
+- Track asset deployment duration
+- Generate client-specific reports
+
+<Info>
+**Client Portal**: Clients can access a read-only view of their deployed assets via public links without requiring login credentials.
+</Info>
+
+## Dashboard & Reporting
+
+<Card title="Real-Time Analytics" icon="chart-line">
+  Comprehensive KPIs and visualizations for data-driven decision making.
+</Card>
+
+### Dashboard KPIs
+
+The main dashboard displays:
+
+<CardGroup cols={2}>
+  <Card title="Active Vehicles">
+    Shows vehicles currently in use vs total fleet size with "Currently in Use" trend
+  </Card>
+  <Card title="Today's Activity">
+    Total vehicle movements registered today with "Movements Today" trend
+  </Card>
+  <Card title="Total Employees">
+    Count of registered employees with "Registered" indicator
+  </Card>
+  <Card title="Pending Maintenance">
+    Vehicles requiring attention with "Requires Attention" warning
+  </Card>
+</CardGroup>
+
+### Analytics Charts
+
+```jsx
+// From Dashboard.jsx - Real-time chart data
+import { BarChart } from '@mui/x-charts/BarChart';
+
+// Top Employees by Trip Count
+const chartEmpleados = {
+  labels: data.empleadosTop.map(e => e.nombre_empleado.split(' ')[0]),
+  data: data.empleadosTop.map(e => e.total_salidas)
+}
+
+// Top Vehicles by Usage
+const chartVehiculos = {
+  labels: data.vehiculosTop.map(v => v.placa),
+  data: data.vehiculosTop.map(v => v.total_usos)
+}
+```
+
+#### Available Reports
+
+1. **Top Employees by Trips**: Bar chart showing employees with most vehicle checkouts
+2. **Top Vehicles by Usage**: Bar chart of most frequently used vehicles
+3. **Mileage by Employee**: Table showing total kilometers driven per employee
+4. **Fuel Consumption**: Visual progress bars showing fuel usage percentages by vehicle
+
+<Tip>
+**Color-Coded Insights**: Fuel consumption bars use color coding - green for efficient (&lt;50%), orange for moderate (50-80%), and red for high consumption (&gt;80%).
+</Tip>
+
+### Export Reports
+
+Generate reports in multiple formats:
+
+- **PDF Reports**: Professional formatted documents with company branding
+- **Excel Workbooks**: Full data exports with charts and formatting
+- **CSV Files**: Raw data for external analysis tools
+
+## Multi-Language Support (i18n)
+
+<Card title="Internationalization" icon="globe">
+  Fully translated interface with automatic language detection and manual switching.
+</Card>
+
+### Supported Languages
+
+- **Spanish (ES)**: Default language with complete translations
+- **English (EN)**: Full English translation
+- **Auto-Detection**: Browser language preference automatically detected
+
+```javascript
+// From source: i18next configuration
+import i18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+// All UI text is translatable
+const { t } = useTranslation();
+<Typography>{t('dashboard.title')}</Typography>
+```
+
+### Translation Coverage
+
+All modules fully translated:
+- Dashboard and KPIs
+- Vehicle management
+- Asset inventory
+- Client management
+- Settings and configuration
+- User management
+- Reports and exports
+- Help documentation
+
+## Security Features
+
+<Card title="Enterprise Security" icon="shield">
+  Multi-layered security with 2FA, session management, and granular permissions.
+</Card>
+
+### Two-Factor Authentication (2FA)
+
+<Steps>
+  <Step title="Enable 2FA">
+    Navigate to Settings → Security and toggle 2FA. System generates QR code for authenticator app.
+  </Step>
+  <Step title="Scan QR Code">
+    Use Google Authenticator, Authy, or any TOTP app to scan the setup QR code.
+  </Step>
+  <Step title="Verify Setup">
+    Enter 6-digit code from authenticator app to confirm setup.
+  </Step>
+  <Step title="Login with 2FA">
+    Future logins require username, password, AND 6-digit TOTP code.
+  </Step>
+</Steps>
+
+```javascript
+// From Login.jsx - 2FA flow
+const data = await login(username, password);
+
+if (data.require_2fa) {
+  // Show 2FA code entry modal
+  setShow2FAModal(true);
+  return;
+}
+
+// Verify 2FA code
+const verified = await login(username, password, twoFactorCode);
+```
+
+### Session Management
+
+Monitor and control active sessions:
+
+- View all active sessions across devices
+- See device type (Mobile, Desktop, Tablet)
+- Check last activity time for each session
+- Revoke other sessions remotely
+- Current session highlighted and protected
+
+<Warning>
+**Security Alert**: If you see suspicious sessions, revoke them immediately and change your password.
+</Warning>
+
+### Login Alerts
+
+Receive notifications for:
+- New login attempts from unrecognized devices
+- Logins from new IP addresses
+- Failed login attempts
+- Password changes
+
+### Role-Based Access Control
+
+Three primary roles with granular permissions:
+
+**Admin**
+- Full system access
+- User management
+- Settings configuration
+- All CRUD operations
+
+**Supervisor**
+- View all data
+- Create/edit vehicles and assets
+- Generate reports
+- Limited administrative functions
+
+**Employee**
+- Register vehicle usage
+- View assigned assets
+- Access personal reports
+- Limited to own data
+
+### Permission System
+
+```javascript
+// Granular permission checks from source
+const canView = hasPermiso('ver_vehiculos');
+const canCreate = hasPermiso('crear_vehiculo');
+const canEdit = hasPermiso('editar_vehiculo');
+const canDelete = hasPermiso('eliminar_vehiculo');
+const canQR = hasPermiso('crear_QR');
+```
+
+Individual permissions for:
+- Viewing, creating, editing, deleting vehicles
+- Managing assets and inventory
+- Creating QR codes
+- Generating reports
+- Managing users
+- Configuring system settings
+
+## Search & Navigation
+
+<Card title="Global Search" icon="search">
+  Keyboard-driven search across all entities with instant preview.
+</Card>
+
+### Global Search (Cmd+K)
+
+Press `Cmd+K` (Mac) or `Ctrl+K` (Windows) to open global search:
+
+- Search across vehicles, assets, clients, sites, employees
+- Instant results as you type
+- Preview entity details without navigating
+- Keyboard navigation with arrow keys
+- Enter to navigate to full page
+
+### Keyboard Shortcuts
+
+Power users can navigate efficiently:
+
+- **`/`**: Focus search input on current page
+- **`Ctrl+Shift+F`**: Focus global search
+- **`Ctrl+Shift+N`**: Create new item (context-aware)
+- **`Ctrl+Shift+E`**: Export current view
+- **`Ctrl+Shift+I`**: Import data
+- **`Ctrl+Shift+L`**: Open filters panel
+
+<Tip>
+**Keyboard Shortcuts**: Press `?` on any page to view available keyboard shortcuts for that module.
+</Tip>
+
+## Export & Import
+
+<Card title="Data Exchange" icon="file-export">
+  Flexible import/export capabilities for integration with other systems.
+</Card>
+
+### Export Formats
+
+**Excel (.xlsx)**
+```javascript
+// Using ExcelJS for rich exports
+import ExcelJS from 'exceljs';
+
+const workbook = new ExcelJS.Workbook();
+const worksheet = workbook.addWorksheet('Assets');
+// Add data, formatting, charts
+await workbook.xlsx.writeBuffer();
+```
+
+**PDF Reports**
+```javascript
+// Using jsPDF with AutoTable
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
+const doc = new jsPDF();
+doc.autoTable({
+  head: headers,
+  body: data,
+  theme: 'grid'
+});
+```
+
+**CSV Export**
+- Plain text format
+- Compatible with all spreadsheet applications
+- Preserves special characters with UTF-8 encoding
+
+### Import Capabilities
+
+Bulk import assets via Excel:
+
+<Steps>
+  <Step title="Download Template">
+    Get pre-formatted Excel template with required columns
+  </Step>
+  <Step title="Fill Data">
+    Add asset information following template structure
+  </Step>
+  <Step title="Upload File">
+    Drag and drop or select Excel file
+  </Step>
+  <Step title="Validate">
+    System validates data and shows errors if any
+  </Step>
+  <Step title="Import">
+    Confirm to create all assets in bulk
+  </Step>
+</Steps>
+
+## Settings & Customization
+
+<Card title="System Configuration" icon="cog">
+  Customize AutoLog to match your organization's needs and branding.
+</Card>
+
+### Appearance Settings
+
+- **Theme Selection**: Light, Dark, or Auto (follows system preference)
+- **Primary Color**: Choose brand color for UI elements
+- **Font Selection**: Multiple font options for readability
+- **Live Preview**: See changes in real-time before applying
+
+### Regional Settings
+
+- **Language**: Spanish or English interface
+- **Timezone**: Automatic or manual timezone selection
+- **Date Format**: Localized date and time formatting
+- **Number Format**: Regional number and currency formatting
+
+### Notification Preferences
+
+- **Email Alerts**: Configure which events trigger emails
+- **In-App Notifications**: Control notification badge behavior
+- **Notification Groups**: Subscribe to relevant notification categories
+
+### Integration Options
+
+- **API Access**: RESTful API for custom integrations
+- **Webhooks**: Real-time event notifications to external systems
+- **SSO Support**: Single Sign-On integration capabilities
+
+---
+
+## Need Help?
+
+For detailed step-by-step instructions, see the [Quick Start Guide](quick-start). For common questions, visit the [Help Center](support/faqs) or contact support.

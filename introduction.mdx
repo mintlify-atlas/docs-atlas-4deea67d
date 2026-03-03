@@ -1,0 +1,192 @@
+---
+title: Welcome to AutoLog
+description: Complete fleet management and asset tracking platform for modern enterprises
+---
+
+# Welcome to AutoLog
+
+AutoLog is a comprehensive SaaS platform designed to streamline fleet management, asset tracking, and client operations for organizations of all sizes. Built with modern technology and security in mind, AutoLog helps you maintain complete visibility and control over your vehicles, assets, and client relationships.
+
+## What is AutoLog?
+
+AutoLog is an all-in-one solution that combines:
+
+- **Fleet Management**: Track vehicle usage, fuel consumption, maintenance schedules, and driver assignments in real-time
+- **Asset Inventory**: Manage equipment and assets across multiple locations, clients, and warehouses with complete movement history
+- **Client Management**: Organize clients, sites, and contracts with detailed asset deployments
+- **Intelligent Reporting**: Generate insights on vehicle utilization, employee activity, mileage tracking, and fuel efficiency
+- **Multi-language Support**: Fully internationalized interface supporting English and Spanish with automatic language detection
+
+## Key Features at a Glance
+
+<CardGroup cols={2}>
+  <Card title="Fleet Tracking" icon="car" href="features#fleet-management">
+    Monitor vehicle status, location, usage patterns, and generate QR codes for instant registration
+  </Card>
+  <Card title="Asset Management" icon="box" href="features#asset-tracking">
+    Track assets across clients, warehouses, and employees with full movement history
+  </Card>
+  <Card title="Client Portal" icon="users" href="features#client-management">
+    Manage client relationships, sites, and deployed assets in one centralized platform
+  </Card>
+  <Card title="Real-time Analytics" icon="chart-line" href="features#reporting">
+    Dashboard KPIs showing active vehicles, employee activity, top users, and fuel consumption
+  </Card>
+</CardGroup>
+
+## Why Choose AutoLog?
+
+<Tip>
+**Built for Scale**: Whether you're managing 10 vehicles or 1,000 assets, AutoLog scales with your organization's needs.
+</Tip>
+
+### Enterprise-Ready Security
+
+AutoLog implements industry-standard security practices:
+
+- **Two-Factor Authentication (2FA)**: Optional 2FA with time-based one-time passwords
+- **Session Management**: Monitor active sessions across devices and revoke access remotely
+- **Login Alerts**: Receive notifications for new login attempts and suspicious activity
+- **Role-Based Access Control**: Granular permissions system for Admin, Supervisor, and Employee roles
+
+### Modern Technology Stack
+
+Built with cutting-edge technologies for performance and reliability:
+
+```json
+{
+  "frontend": "React 19 + Vite",
+  "ui_framework": "Material UI Joy + TailwindCSS",
+  "internationalization": "i18next with browser language detection",
+  "charts": "MUI X-Charts for real-time analytics",
+  "exports": "Excel, PDF, CSV generation",
+  "authentication": "HttpOnly cookie-based sessions"
+}
+```
+
+## Getting Started
+
+<Steps>
+  <Step title="Quick Start Guide">
+    Follow our [Quick Start guide](quick-start) to set up your account and create your first vehicle entry
+  </Step>
+  <Step title="Explore Features">
+    Learn about all available features in the [Features documentation](features)
+  </Step>
+  <Step title="Configure Settings">
+    Customize AutoLog to match your organization's branding and workflow preferences
+  </Step>
+</Steps>
+
+## What You Can Do with AutoLog
+
+### Fleet Operations
+
+- Register vehicle check-ins and check-outs with employee tracking
+- Monitor real-time vehicle status: Available, In Use, Under Maintenance
+- Generate QR codes for each vehicle for mobile-friendly registration
+- Track fuel consumption patterns and identify efficiency opportunities
+- View top utilized vehicles and high-mileage employees
+
+### Asset Inventory
+
+```jsx
+// Example: Assets are tracked with comprehensive metadata
+const asset = {
+  codigo: "LAPTOP-001",
+  nombre: "Dell Latitude 7490",
+  tipo: "Laptop",
+  modelo: "Latitude 7490",
+  serial_number: "DL7490-2024-001",
+  estatus: "Activo", // or: En Reparación, Backup, Baja
+  tipo_destino: "Cliente", // or: Bodega, Empleado
+  cliente_nombre: "Acme Corporation",
+  site_nombre: "San Pedro Sula Office"
+}
+```
+
+- Track computers, equipment, and other assets with serial numbers and models
+- Move assets between warehouses, clients, and employees
+- View complete movement history with timestamps and responsible users
+- Filter and search across thousands of assets instantly
+- Bulk import assets via Excel templates
+
+### Reporting & Analytics
+
+The dashboard provides real-time KPIs including:
+
+- **Active Vehicles**: Current in-use vehicles vs total fleet size
+- **Today's Activity**: Number of vehicle movements registered today
+- **Total Employees**: Active employee count
+- **Top Performers**: Charts showing employees with most trips and vehicles with highest usage
+- **Fuel Consumption**: Visual progress bars for fuel usage by vehicle
+- **Mileage Tracking**: Kilometer totals by employee for expense reporting
+
+<Note>
+All charts and reports are generated in real-time from your live data, ensuring you always have the most current information.
+</Note>
+
+## Platform Highlights
+
+### Internationalization (i18n)
+
+AutoLog automatically detects your browser language and displays the interface in English or Spanish:
+
+```javascript
+// From source: i18next with browser language detection
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+```
+
+All dates, numbers, and text adapt to your locale preferences.
+
+### QR Code Generation
+
+Generate scannable QR codes for:
+- **Vehicles**: Instant check-in/check-out from mobile devices
+- **Assets**: Public information pages for asset tracking
+- **Custom logos**: Embed your company logo in QR codes for branding
+
+### Export Capabilities
+
+Export data in multiple formats:
+- **Excel (.xlsx)**: Full data export with formatting using ExcelJS
+- **PDF**: Professional reports with jsPDF and AutoTable
+- **CSV**: Plain-text exports for external processing
+
+## Support & Resources
+
+<CardGroup cols={3}>
+  <Card title="Quick Start" icon="rocket" href="quick-start">
+    Get up and running in minutes
+  </Card>
+  <Card title="Features Guide" icon="book" href="features">
+    Detailed feature documentation
+  </Card>
+  <Card title="Help Center" icon="question-circle" href="support/faqs">
+    FAQs, tutorials, and support
+  </Card>
+</CardGroup>
+
+<Warning>
+**Security Best Practice**: Always enable Two-Factor Authentication (2FA) for accounts with administrative privileges to protect sensitive fleet and asset data.
+</Warning>
+
+## Recent Updates
+
+AutoLog is actively developed with regular feature releases. Recent highlights include:
+
+- **v2.3.2** (Dec 2025): Fixed vehicle modal enter key bug
+- **v2.3.1** (Dec 2025): Asset inventory list with advanced filtering and i18n
+- **v2.3.0** (Dec 2025): Complete settings and security module redesign
+- **v2.2.0** (Dec 2025): Global i18n rollout and UI modernization
+- **v2.0.0** (Dec 2025): Two-factor authentication and login alerts
+
+See the full [changelog](https://github.com/khernan14/AutoLog/blob/main/CHANGELOG.md) for details.
+
+---
+
+## Ready to Get Started?
+
+Jump into the [Quick Start guide](quick-start) to begin using AutoLog, or explore the [complete features](features) to understand everything the platform offers.

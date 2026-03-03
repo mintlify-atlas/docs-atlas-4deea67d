@@ -1,0 +1,475 @@
+---
+title: Inventory Management
+description: Manage assets, warehouses, and inventory movements across your organization
+---
+
+## Overview
+
+AutoLog's Inventory Management system allows you to track assets (activos) across multiple warehouses (bodegas), assign them to employees or clients, and maintain a complete history of movements and locations.
+
+## Core Concepts
+
+### Assets (Activos)
+
+Assets are trackable items in your inventory system, such as:
+- IT equipment (laptops, monitors, phones)
+- Tools and machinery
+- Furniture and fixtures
+- Any other organizational property
+
+### Warehouses (Bodegas)
+
+Warehouses are physical storage locations where assets are kept. Each warehouse:
+- Has a unique name and description
+- Is associated with a specific city/location
+- Contains a collection of assets
+- Can be managed independently
+
+### Destinations
+
+Assets can be assigned to three types of destinations:
+- **Bodega**: Stored in a warehouse
+- **Cliente**: Assigned to a client at a specific site
+- **Empleado**: Assigned to an employee
+
+## Managing Warehouses
+
+### Viewing Warehouses
+
+Navigate to Inventory > Warehouses to see all registered warehouses.
+
+**Warehouse list shows**:
+- Warehouse name
+- City/location
+- Description
+- Number of assets stored
+
+<Tip>
+  Click on any warehouse row to view detailed information and the assets it contains.
+</Tip>
+
+### Creating a Warehouse
+
+<Steps>
+  <Step title="Open Creation Form">
+    Click "New Warehouse" in the top-right corner.
+    
+    <Note>
+      Requires `crear_bodegas` or `gestionar_bodegas` permission.
+    </Note>
+  </Step>
+  
+  <Step title="Fill Required Information">
+    - **Name**: Unique warehouse identifier (e.g., "Main Warehouse", "HQ Storage")
+    - **City**: Select from available locations
+    - **Description**: Optional notes about the warehouse
+  </Step>
+  
+  <Step title="Save and Navigate">
+    Click "Save" to create the warehouse. You can immediately add assets to it.
+  </Step>
+</Steps>
+
+### Editing Warehouse Details
+
+1. Find the warehouse in the list
+2. Click the three-dot menu icon
+3. Select "Edit"
+4. Modify the information
+5. Save changes
+
+<Info>
+  Editing a warehouse does not affect the assets stored within it.
+</Info>
+
+## Managing Assets
+
+### Global Asset List
+
+The global asset list (Inventory > Assets) shows all assets across all warehouses.
+
+**Columns displayed**:
+- **Code**: Unique asset identifier
+- **Name**: Asset description
+- **Type**: Category (laptop, monitor, tool, etc.)
+- **Model**: Manufacturer model number
+- **Serial Number**: Hardware serial
+- **Status**: Current state (Available, In Use, Maintenance, etc.)
+- **Destination**: Current location or assignment
+
+### Asset Statuses
+
+Assets can have various statuses with color coding:
+
+- **Disponible** (Available): Ready for assignment - Blue
+- **En Uso** (In Use): Currently assigned - Green
+- **Mantenimiento** (Maintenance): Under repair - Yellow
+- **Baja** (Decommissioned): Retired from service - Red
+- **Extraviado** (Lost): Cannot be located - Orange
+
+### Creating an Asset
+
+<Steps>
+  <Step title="Navigate to Warehouse">
+    Assets are typically created within a specific warehouse. Navigate to the warehouse detail page and click "Add Asset."
+    
+    <Note>
+      You can also create assets from the global asset list if your organization allows it.
+    </Note>
+  </Step>
+  
+  <Step title="Fill Asset Information">
+    Required fields:
+    - **Code**: Unique identifier (often an asset tag number)
+    - **Name**: Descriptive name
+    - **Type**: Asset category
+    - **Status**: Initial status (usually "Disponible")
+    
+    Optional fields:
+    - Model
+    - Serial number
+    - Purchase date
+    - Purchase price
+    - Notes
+  </Step>
+  
+  <Step title="Set Initial Location">
+    If creating from within a warehouse, it's automatically assigned to that warehouse. Otherwise, select the destination.
+  </Step>
+  
+  <Step title="Save">
+    Click "Save" to create the asset. It will appear in the warehouse inventory immediately.
+  </Step>
+</Steps>
+
+### Editing Assets
+
+<Steps>
+  <Step title="Locate the Asset">
+    Use search or filters to find the asset:
+    - Search by code, name, model, or serial number
+    - Filter by status, type, or location
+  </Step>
+  
+  <Step title="Open Edit Form">
+    Click the edit icon (pencil) in the actions column.
+  </Step>
+  
+  <Step title="Modify Information">
+    Update any field except the unique code (which is typically immutable).
+  </Step>
+  
+  <Step title="Save Changes">
+    Click "Save." Changes are logged in the asset history.
+  </Step>
+</Steps>
+
+## Moving Assets
+
+Moving assets between locations is a core inventory operation.
+
+### Initiating a Move
+
+<Steps>
+  <Step title="Select Asset">
+    Find the asset you want to move and click the move/transfer icon (arrows icon).
+  </Step>
+  
+  <Step title="Choose Destination Type">
+    Select where the asset is going:
+    - **To Warehouse**: Transfer to another warehouse
+    - **To Client**: Assign to a client site
+    - **To Employee**: Assign to an employee
+  </Step>
+  
+  <Step title="Specify Destination">
+    Depending on the type:
+    - **Warehouse**: Select from available warehouses
+    - **Client**: Choose client and specific site
+    - **Employee**: Select employee from the list
+  </Step>
+  
+  <Step title="Add Notes">
+    Optional: Add a reason or notes about the movement.
+  </Step>
+  
+  <Step title="Confirm Transfer">
+    Click "Move" to execute the transfer. The asset's location and history are updated immediately.
+  </Step>
+</Steps>
+
+<Info>
+  All movements are logged with timestamp, user, source, destination, and notes. This creates a complete audit trail.
+</Info>
+
+### Movement Types
+
+**Internal Transfer**
+- Warehouse → Warehouse
+- Tracked for inventory optimization
+
+**Assignment**
+- Warehouse → Employee or Client
+- Often changes status to "En Uso"
+
+**Return**
+- Employee/Client → Warehouse
+- Status typically returns to "Disponible"
+
+## Asset History
+
+Every asset maintains a complete movement history.
+
+### Viewing Asset History
+
+1. Click the history icon (clock) next to the asset
+2. A modal displays all movements in chronological order
+
+**History entries include**:
+- Date and time
+- User who performed the action
+- Source location
+- Destination location
+- Movement type
+- Notes
+- Status at the time
+
+<Tip>
+  Use asset history to:
+  - Verify asset location
+  - Track accountability
+  - Audit movements
+  - Identify patterns (e.g., frequently moved items)
+</Tip>
+
+## QR Codes for Assets
+
+Similar to vehicles, assets can have QR codes for quick identification and lookup.
+
+### Generating Asset QR Codes
+
+<Steps>
+  <Step title="Access QR Generator">
+    Click the QR code icon next to the asset in the list.
+  </Step>
+  
+  <Step title="View Generated Code">
+    A modal shows:
+    - Asset name and code
+    - QR code image
+    - Public link to asset details
+  </Step>
+  
+  <Step title="Download or Share">
+    - Download as PNG for printing
+    - Copy link for digital access
+    - Place on asset label or packaging
+  </Step>
+</Steps>
+
+**QR codes enable**:
+- Fast asset lookup
+- Mobile-friendly access to details
+- Easy inventory audits
+- Self-service information for users
+
+## Search and Filtering
+
+### Search Functionality
+
+The search bar supports searching by:
+- Asset code (e.g., "LAP-001")
+- Name (e.g., "MacBook Pro")
+- Model (e.g., "ThinkPad X1")
+- Serial number
+
+<Info>
+  Search is accent-insensitive and case-insensitive, making it easy to find assets quickly.
+</Info>
+
+### Advanced Filters
+
+Click the "Filters" button to open the filter panel:
+
+**Available filters**:
+- **Status**: Filter by one or more statuses
+- **Type**: Filter by asset category
+- **Location**: Filter by destination type (Warehouse, Client, Employee)
+
+**Applying filters**:
+1. Select desired filter values
+2. Click "Apply"
+3. Asset list updates to show only matching items
+4. Active filters are indicated with a badge on the filter button
+
+### Clearing Filters
+
+- Click "Clear" in the filter panel to remove all filters
+- Or remove individual filter chips if shown
+
+## Bulk Operations
+
+### Importing Assets
+
+<Steps>
+  <Step title="Prepare CSV File">
+    Create a CSV with columns:
+    - code
+    - nombre (name)
+    - tipo (type)
+    - modelo (model)
+    - serial_number
+    - estatus (status)
+    - And any additional fields
+  </Step>
+  
+  <Step title="Open Import Dialog">
+    Click "Options" > "Import" in the asset list.
+  </Step>
+  
+  <Step title="Upload File">
+    Select your CSV file and upload it.
+  </Step>
+  
+  <Step title="Map Columns">
+    The system will attempt to auto-map CSV columns to asset fields. Review and adjust if needed.
+  </Step>
+  
+  <Step title="Preview and Confirm">
+    Review the assets to be imported, then confirm.
+  </Step>
+  
+  <Step title="Import">
+    Assets are created in batch. You'll see a summary of successes and any errors.
+  </Step>
+</Steps>
+
+<Warning>
+  Ensure asset codes are unique before importing. Duplicate codes will cause import errors.
+</Warning>
+
+### Exporting Assets
+
+1. Apply any desired filters to the asset list
+2. Click "Options" > "Export"
+3. Choose format:
+   - CSV (for spreadsheets)
+   - Excel (XLSX)
+   - PDF (for reports)
+4. Customize columns to export (optional)
+5. Download the file
+
+<Tip>
+  Exports respect your current filters, so you can export subsets of inventory (e.g., only assets in a specific warehouse).
+</Tip>
+
+## Pagination and Display
+
+The asset list supports pagination for large inventories:
+
+- **Results per page**: 10, 25, 50, or 100 items
+- **Page navigation**: First, previous, next, last
+- **Result counter**: Shows "Showing X-Y of Z results"
+
+### Optimizing for Large Inventories
+
+- Use filters to narrow results
+- Increase results per page to 100 for faster browsing
+- Use search for direct lookups
+- Bookmark frequently accessed warehouses
+
+## Permissions
+
+Inventory management uses granular permissions:
+
+| Permission | Capability |
+|------------|------------|
+| `ver_bodegas` | View warehouses |
+| `crear_bodegas` | Create warehouses |
+| `editar_bodegas` | Edit warehouses |
+| `gestionar_bodegas` | Full warehouse admin |
+| `ver_activos` | View assets |
+| `crear_activos` | Create assets |
+| `editar_activos` | Edit assets |
+| `mover_activos` | Move assets between locations |
+| `ver_historial_activos` | View asset history |
+| `crear_QR` | Generate QR codes |
+
+<Note>
+  Administrators automatically have all permissions. Contact your admin to request additional access.
+</Note>
+
+## Keyboard Shortcuts
+
+Speed up your workflow with these shortcuts:
+
+- `/` or `Ctrl+Shift+F`: Focus search bar
+- `Ctrl+Shift+N`: Create new asset (if permitted)
+- `Ctrl+Shift+E`: Export assets
+- `Ctrl+Shift+I`: Import assets
+- `Ctrl+Shift+L`: Open filters
+
+<Info>
+  Press the keyboard icon in the toolbar to see all available shortcuts.
+</Info>
+
+## Mobile Experience
+
+Inventory management is fully mobile-responsive:
+- Touch-optimized action buttons
+- Swipeable tables
+- Mobile QR scanning
+- Simplified filters for smaller screens
+
+**Best practices on mobile**:
+- Use search instead of browsing large lists
+- QR scanning is faster than manual entry
+- Landscape mode for better table viewing
+
+## Troubleshooting
+
+### Cannot Move Asset
+
+**Problem**: Move button disabled or errors when moving
+
+**Solutions**:
+- Verify you have `mover_activos` permission
+- Check if asset is already in a pending move
+- Ensure destination is valid and active
+- Reload page to refresh state
+
+### Asset Not Appearing in Warehouse
+
+**Problem**: Asset created but doesn't show in warehouse list
+
+**Solutions**:
+- Check applied filters (clear all filters)
+- Verify the asset was assigned to the correct warehouse
+- Use global asset search to locate it
+- Check if asset status is hiding it
+
+### Import Failed
+
+**Problem**: CSV import returns errors
+
+**Solutions**:
+- Verify CSV format matches template
+- Check for duplicate asset codes
+- Ensure required fields are present
+- Validate data types (dates, numbers)
+- Remove special characters from codes
+
+## Related Features
+
+- [Dashboard](dashboard): View inventory statistics
+- [Reports](reports): Generate inventory reports
+- [Search](search): Use global search to find assets
+
+## Technical Reference
+
+**Source Files**:
+- Assets list: `src/pages/Inventario/ActivosList.jsx`
+- Warehouses: `src/pages/Inventario/BodegasList.jsx`
+- Move modal: `src/pages/Inventario/MoverActivoModal.jsx`
+- History: `src/pages/Inventario/HistorialActivoModal.jsx`
+- Import: `src/pages/Inventario/ModalImportarActivos.jsx`

@@ -1,0 +1,527 @@
+---
+title: Asset Tracking
+description: Track and manage inventory across warehouses, clients, and employees with complete movement history
+---
+
+AutoLog's Asset Tracking system provides comprehensive inventory management across multiple locations, including warehouses (bodegas), client sites, and employee assignments.
+
+## Overview
+
+The asset tracking module enables you to:
+- Manage warehouse inventory (bodegas)
+- Track asset movements between locations
+- Monitor asset status and condition
+- Generate QR codes for asset identification
+- View complete asset history
+- Import/export asset data in bulk
+
+## Warehouse Management (Bodegas)
+
+### Creating a Warehouse
+
+<Steps>
+  <Step title="Open Warehouse List">
+    Navigate to **Inventario > Bodegas** from the main menu.
+  </Step>
+  
+  <Step title="Add New Warehouse">
+    Click **+ Nueva Bodega**
+    
+    Required information:
+    - **Nombre:** Warehouse name
+    - **Ciudad:** City/location
+    - **Descripción:** Optional description
+  </Step>
+  
+  <Step title="Save Warehouse">
+    Click **Guardar** - the warehouse is created and ready to receive assets
+  </Step>
+</Steps>
+
+**API Service:**
+
+```jsx
+// Source: BodegasServices.jsx
+export async function createBodega(data) {
+  const res = await fetchConToken(endpoints.Bodegas, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || "Error al crear bodega");
+  return json;
+}
+```
+
+### Viewing Warehouse Details
+
+Click on any warehouse name to view:
+
+<CardGroup cols={2}>
+  <Card title="Inventory Summary" icon="package">
+    - Total assets stored
+    - Assets by type
+    - Assets by status
+    - Recent movements
+  </Card>
+  
+  <Card title="Asset List" icon="list">
+    Detailed table showing:
+    - Asset code and name
+    - Type and model
+    - Serial number
+    - Current status
+    - Quick actions
+  </Card>
+</CardGroup>
+
+### Warehouse Filtering
+
+```jsx
+// Source: BodegasList.jsx:145-153
+const filtered = useMemo(() => {
+  const s = normalize(search);
+  return rows.filter(
+    (r) =>
+      normalize(r.nombre).includes(s) ||
+      normalize(r.ciudad).includes(s) ||
+      normalize(r.descripcion).includes(s)
+  );
+}, [rows, search]);
+```
+
+## Asset Management
+
+### Creating an Asset
+
+<Tabs>
+  <Tab title="Single Asset">
+    <Steps>
+      <Step title="Navigate to Assets">
+        Go to **Inventario > Activos**
+      </Step>
+      
+      <Step title="Fill Asset Form">
+        Required fields:
+        - **Código:** Unique asset identifier
+        - **Nombre:** Asset name/description
+        - **Tipo:** Asset type (Computer, Monitor, Phone, etc.)
+        
+        Optional fields:
+        - **Modelo:** Model information
+        - **Serial Number:** Manufacturer serial number
+        - **Estatus:** Initial status (usually "Disponible")
+        - **Initial Location:** Warehouse, client, or employee
+      </Step>
+      
+      <Step title="Save Asset">
+        Click **Guardar** - asset is created and added to inventory
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="Bulk Import">
+    Import multiple assets at once:
+    
+    1. Click **Acciones > Importar**
+    2. Download the Excel/CSV template
+    3. Fill in asset information
+    4. Upload the completed file
+    5. Review import preview
+    6. Confirm import
+    
+    <Warning>
+      Ensure all asset codes are unique. Duplicate codes will be rejected during import.
+    </Warning>
+  </Tab>
+</Tabs>
+
+### Asset Properties
+
+Each asset tracks extensive information:
+
+| Property | Description | Example |
+|----------|-------------|---------|
+| **codigo** | Unique identifier | "LAP-001" |
+| **nombre** | Descriptive name | "Dell Latitude 5520" |
+| **tipo** | Asset category | "Laptop" |
+| **modelo** | Model/variant | "Latitude 5520" |
+| **serial_number** | Manufacturer serial | "ABC123XYZ" |
+| **estatus** | Current status | "Disponible", "En Uso", "Dañado" |
+| **tipo_destino** | Location type | "Bodega", "Cliente", "Empleado" |
+| **bodega_nombre** | Warehouse name (if in bodega) | "Bodega Central" |
+| **cliente_nombre** | Client name (if at client) | "Acme Corp" |
+| **site_nombre** | Client site (if applicable) | "Main Office" |
+| **empleado_nombre** | Employee name (if assigned) | "Juan Pérez" |
+
+### Asset Status Colors
+
+```jsx
+// Source: Used throughout asset views
+export const ESTATUS_COLOR = {
+  "Disponible": "success",
+  "En Uso": "primary",
+  "En Mantenimiento": "warning",
+  "Dañado": "danger",
+  "Inactivo": "neutral"
+};
+```
+
+<Note>
+Status colors provide quick visual identification of asset condition across all views.
+</Note>
+
+## Moving Assets
+
+Assets can be moved between warehouses, clients, and employees.
+
+### Movement Types
+
+<Accordion title="Warehouse to Warehouse">
+  Transfer assets between storage locations:
+  
+  1. Select asset from source warehouse
+  2. Click **Mover** icon
+  3. Select destination warehouse
+  4. Add movement notes (optional)
+  5. Confirm transfer
+  
+  **Use cases:**
+  - Inventory redistribution
+  - Stock balancing
+  - Warehouse consolidation
+</Accordion>
+
+<Accordion title="Warehouse to Client">
+  Deploy assets to client sites:
+  
+  1. Open asset details
+  2. Click **Mover** action
+  3. Select **Cliente** as destination type
+  4. Choose client company
+  5. Select specific site (if applicable)
+  6. Confirm deployment
+  
+  **Tracked information:**
+  - Deployment date
+  - Client name and site
+  - Expected return date (optional)
+  - Purpose/project notes
+</Accordion>
+
+<Accordion title="Warehouse to Employee">
+  Assign assets to employees:
+  
+  1. Select asset
+  2. Click **Mover**
+  3. Choose **Empleado** as destination
+  4. Search and select employee
+  5. Add assignment reason
+  6. Confirm assignment
+  
+  **Auto-tracking:**
+  - Assignment date
+  - Employee department
+  - Manager approval (if configured)
+  - Responsibility acknowledgment
+</Accordion>
+
+### Movement History
+
+Every asset maintains a complete movement history:
+
+```jsx
+// Source: ActivosServices.jsx:66-71
+export async function getHistorialUbicaciones(id) {
+  const res = await fetchConToken(
+    `${endpoints.getActivoById}${id}/historial`
+  );
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || "Error al obtener historial");
+  return json;
+}
+```
+
+<Steps>
+  <Step title="Open History">
+    Click the **History** icon on any asset
+  </Step>
+  
+  <Step title="View Timeline">
+    See chronological list of movements:
+    - Date and time
+    - From location
+    - To location
+    - User who performed movement
+    - Notes/reason
+  </Step>
+  
+  <Step title="Export History">
+    Download complete history as PDF or Excel for auditing
+  </Step>
+</Steps>
+
+## Global Asset List
+
+The global asset view provides system-wide inventory visibility.
+
+### Advanced Search and Filtering
+
+**Search Bar Features:**
+
+```jsx
+// Source: ActivosList.jsx:186-208
+const filtered = useMemo(() => {
+  const s = normalize(search);
+  return rows.filter((r) => {
+    const matchSearch =
+      normalize(r.codigo).includes(s) ||
+      normalize(r.nombre).includes(s) ||
+      normalize(r.modelo).includes(s) ||
+      normalize(r.serial_number).includes(s);
+
+    const matchStatus =
+      statusFilter.length === 0 || statusFilter.includes(r.estatus);
+    const matchType = 
+      typeFilter.length === 0 || typeFilter.includes(r.tipo);
+
+    const matchUbicacion =
+      !ubicacionFilter ||
+      (ubicacionFilter === "Cliente" && r.tipo_destino === "Cliente") ||
+      (ubicacionFilter === "Bodega" && r.tipo_destino === "Bodega") ||
+      (ubicacionFilter === "Empleado" && r.tipo_destino === "Empleado") ||
+      (ubicacionFilter === "SinUbicacion" && !r.tipo_destino);
+
+    return matchSearch && matchStatus && matchType && matchUbicacion;
+  });
+}, [rows, search, statusFilter, typeFilter, ubicacionFilter]);
+```
+
+### Filter Options
+
+<Tabs>
+  <Tab title="By Status">
+    Filter by asset condition:
+    - ✅ Disponible (Available)
+    - 🔵 En Uso (In Use)
+    - ⚠️ En Mantenimiento (Maintenance)
+    - ❌ Dañado (Damaged)
+    - ⚪ Inactivo (Inactive)
+    
+    **Multi-select:** Choose multiple statuses
+  </Tab>
+  
+  <Tab title="By Type">
+    Common asset types:
+    - Laptops
+    - Monitors
+    - Phones/Tablets
+    - Network Equipment
+    - Furniture
+    - Tools
+    
+    **Dynamic list:** Types populate from your inventory
+  </Tab>
+  
+  <Tab title="By Location">
+    Filter by current location type:
+    - 🏢 Cliente (At client site)
+    - 📦 Bodega (In warehouse)
+    - 👤 Empleado (Assigned to employee)
+    - ❓ Sin Ubicación (Unassigned)
+  </Tab>
+</Tabs>
+
+### Pagination and Sorting
+
+**Pagination Controls:**
+- Rows per page: 10, 25, 50, 100
+- Page navigation buttons
+- Current range display: "Showing 1-25 of 250"
+
+```jsx
+// Source: ActivosList.jsx:246-250
+const totalPages = Math.max(1, Math.ceil(sortedRows.length / perPage));
+const pageRows = useMemo(() => {
+  const start = (page - 1) * perPage;
+  return sortedRows.slice(start, start + perPage);
+}, [sortedRows, page, perPage]);
+```
+
+**Sortable Columns:**
+- Code (código)
+- Name (nombre)
+- Type (tipo)
+- Model (modelo)
+- Status (estatus)
+- Destination (tipo_destino)
+
+## QR Code Generation
+
+Generate QR codes for easy asset identification and tracking.
+
+### Creating Asset QR Codes
+
+<Steps>
+  <Step title="Select Asset">
+    Find the asset in any list view
+  </Step>
+  
+  <Step title="Generate QR">
+    Click the **QR** icon - system generates:
+    - Public link to asset details
+    - QR code with company logo
+    - Printable format
+  </Step>
+  
+  <Step title="Download and Print">
+    Options:
+    - **Descargar PNG:** High-resolution image
+    - **Test Link:** Verify QR functionality
+    - **Print:** Direct print option
+  </Step>
+</Steps>
+
+**QR Code Service:**
+
+```jsx
+// Source: PublicLinksService.jsx
+export async function getPublicLinkForActivo(idActivo) {
+  const res = await fetchConToken(
+    `${endpoints.getActivos}${idActivo}/public/link`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  
+  if (!res.ok) throw new Error("Error generating public link");
+  
+  // Returns: { url, token }
+  return await res.json();
+}
+```
+
+### QR Code Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Physical Attachment" icon="tag">
+    - Print on durable material
+    - Attach to asset surface
+    - Protect with clear laminate
+    - Include asset code as text
+  </Card>
+  
+  <Card title="Public Access" icon="eye">
+    QR codes link to public pages showing:
+    - Asset identification
+    - Basic specifications
+    - Current location (if permitted)
+    - Contact information
+  </Card>
+</CardGroup>
+
+## Import and Export
+
+### Bulk Import
+
+Import assets from Excel or CSV:
+
+<Warning>
+Before importing, ensure your spreadsheet follows the template format exactly. Missing required fields will cause import errors.
+</Warning>
+
+**Required columns:**
+- codigo (unique)
+- nombre
+- tipo
+
+**Optional columns:**
+- modelo
+- serial_number
+- estatus
+- id_bodega (warehouse ID)
+
+### Export Options
+
+```jsx
+// Source: ActivosList.jsx:450-470
+const EXPORT_COLS = [
+  { label: t("inventory.list.columns.code"), key: "codigo" },
+  { label: t("inventory.list.columns.name"), key: "nombre" },
+  { label: t("inventory.list.columns.type"), key: "tipo" },
+  { 
+    label: t("inventory.list.columns.model"),
+    key: "modelo",
+    get: (r) => r.modelo || ""
+  },
+  {
+    label: t("inventory.list.columns.serial"),
+    key: "serial_number",
+    get: (r) => r.serial_number || ""
+  },
+  { label: t("inventory.list.columns.status"), key: "estatus" },
+  {
+    label: t("inventory.list.columns.destination"),
+    key: "tipo_destino",
+    get: getDestinoText,
+  },
+];
+```
+
+**Export formats:**
+- Excel (.xlsx) - Full formatting
+- CSV - Universal compatibility
+- PDF - Print-ready reports
+
+## Keyboard Shortcuts
+
+Power users can navigate faster with keyboard shortcuts:
+
+| Shortcut | Action |
+|----------|--------|
+| `/` | Focus search bar |
+| `Ctrl/Cmd + Shift + F` | Focus search |
+| `Ctrl/Cmd + Shift + N` | New asset |
+| `Ctrl/Cmd + Shift + E` | Export data |
+| `Ctrl/Cmd + Shift + I` | Import data |
+| `Ctrl/Cmd + Shift + L` | Open filters |
+
+## Permissions
+
+Asset tracking actions require specific permissions:
+
+| Action | Permission Required |
+|--------|--------------------|
+| View assets | `ver_activos` |
+| Create asset | `crear_activos` |
+| Edit asset | `editar_activos` |
+| Move asset | `mover_activos` |
+| View history | `ver_historial_activos` |
+| Generate QR | `crear_QR` |
+| Manage warehouses | `gestionar_bodegas` |
+
+**Permission Example:**
+
+```jsx
+// Source: ActivosList.jsx:97-107
+const isAdmin = userData?.rol?.toLowerCase() === "admin";
+const can = useCallback(
+  (p) => isAdmin || hasPermiso(p),
+  [isAdmin, hasPermiso]
+);
+
+const canView = can("ver_activos");
+const canCreate = can("crear_activos");
+const canEdit = can("editar_activos");
+const canMove = can("mover_activos");
+const canViewHistory = can("ver_historial_activos");
+const canQR = can("crear_QR");
+```
+
+## Related Resources
+
+- [Fleet Management](features/fleet-management) - Vehicle tracking
+- [Client Management](features/client-management) - Deploy assets to clients
+- [Reporting](features/reporting) - Asset utilization reports

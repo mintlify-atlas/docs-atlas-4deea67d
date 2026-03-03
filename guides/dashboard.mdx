@@ -1,0 +1,229 @@
+---
+title: Dashboard
+description: Get a real-time overview of your fleet operations with AutoLog's comprehensive dashboard
+---
+
+## Overview
+
+The AutoLog Dashboard provides a centralized view of your fleet's key metrics, activity, and performance. It displays real-time statistics, interactive charts, and detailed reports to help you make informed decisions.
+
+## Dashboard Layout
+
+The dashboard is organized into several sections:
+
+1. **KPI Cards**: High-level metrics at a glance
+2. **Activity Charts**: Visual representations of usage patterns
+3. **Data Tables**: Detailed breakdowns of top performers and resource consumption
+
+## Key Performance Indicators (KPIs)
+
+### Active Vehicles
+
+Shows the current ratio of vehicles in use versus total fleet size.
+
+<Info>
+  Format: `{vehicles_in_use} / {total_vehicles}`
+  
+  Example: "12 / 45" means 12 vehicles are currently in use out of a total fleet of 45.
+</Info>
+
+**What it tracks:**
+- Real-time vehicle availability
+- Fleet utilization rate
+- Currently assigned vehicles
+
+### Today's Activity
+
+Displays the total number of vehicle movements (check-outs and check-ins) recorded today.
+
+<Tip>
+  This metric resets at midnight and helps you understand daily operational volume.
+</Tip>
+
+### Total Employees
+
+Shows the number of active employees registered in the system.
+
+### Pending Maintenance
+
+Indicates vehicles or tasks requiring attention. This includes:
+- Scheduled maintenance overdue
+- Pending inspections
+- Flagged issues from previous trips
+
+<Warning>
+  Keep this number at zero to ensure fleet reliability and safety compliance.
+</Warning>
+
+## Interactive Charts
+
+### Top Employees by Activity
+
+A bar chart showing the 5 employees with the most vehicle check-outs during the selected period.
+
+**Data displayed:**
+- Employee name (first name shown for space efficiency)
+- Total number of exits/trips
+- Color-coded bars for easy comparison
+
+**Use cases:**
+- Identify heavy fleet users
+- Plan resource allocation
+- Recognize top performers
+
+### Most Used Vehicles
+
+A bar chart displaying the 5 most frequently used vehicles by license plate.
+
+**Data displayed:**
+- Vehicle license plate (placa)
+- Total usage count
+- Visual comparison of usage frequency
+
+**Use cases:**
+- Identify vehicles needing more frequent maintenance
+- Balance wear across the fleet
+- Plan vehicle replacements based on usage
+
+<Note>
+  Both charts are interactive. Hover over bars to see exact values and additional details.
+</Note>
+
+## Detailed Data Tables
+
+### Mileage by Employee
+
+Lists employees by total kilometers traveled.
+
+**Columns:**
+- Employee name
+- Total kilometers driven
+- Visual chip display for easy reading
+
+**How it's calculated:**
+- Sum of all trip distances for each employee
+- Updated automatically when trips are completed
+- Sorted from highest to lowest mileage
+
+<Accordion title="Why track employee mileage?">
+  - **Compliance**: Some organizations require mileage tracking for tax/reimbursement
+  - **Usage Patterns**: Identify employees with unusual travel patterns
+  - **Resource Planning**: Allocate vehicles based on typical travel needs
+  - **Performance Reviews**: Include as objective metric in evaluations
+</Accordion>
+
+### Fuel Consumption by Vehicle
+
+Shows average fuel consumption as a percentage for each vehicle.
+
+**Columns:**
+- Vehicle make, model, and license plate
+- Consumption percentage (0-100%)
+- Color-coded progress bar:
+  - Green (0-50%): Efficient
+  - Yellow (51-80%): Moderate
+  - Red (81-100%): High consumption
+
+**What the percentage means:**
+- Represents average fuel used relative to tank capacity per trip
+- Higher percentages indicate more frequent refueling
+- Helps identify vehicles with potential efficiency issues
+
+<Info>
+  Click on a vehicle in the table to view detailed consumption history and trends.
+</Info>
+
+## Refreshing Data
+
+The dashboard loads data automatically when you visit the page. To manually refresh:
+
+1. Click the circular refresh icon in the top-right corner of the dashboard
+2. The system will fetch the latest data from all sources
+3. A loading indicator appears briefly during the refresh
+
+<Tip>
+  The dashboard typically refreshes within 2-3 seconds. If it takes longer, check your network connection.
+</Tip>
+
+## Error Handling
+
+If the dashboard fails to load data, you'll see:
+
+1. **Error Alert**: A red banner with error details
+2. **Retry Button**: Click to attempt reloading the data
+3. **Contact Support**: If errors persist, contact your system administrator
+
+**Common issues:**
+- Network connectivity problems
+- Server maintenance windows
+- Permission restrictions
+
+## Customizing Your View
+
+While the dashboard layout is standardized, you can:
+
+- **Apply Filters**: Some organizations enable date range filters
+- **Change Locale**: Switch language using the translation system
+- **Print/Export**: Use browser print functionality for reports
+
+<Note>
+  Custom dashboard configurations may be available for administrator accounts. Contact your AutoLog representative for enterprise customization options.
+</Note>
+
+## Data Sources
+
+The dashboard pulls data from multiple sources:
+
+| Metric | Source | Update Frequency |
+|--------|--------|------------------|
+| Active Vehicles | Real-time vehicle status | Immediate |
+| Today's Activity | Daily movement logs | Real-time |
+| Total Employees | User database | On change |
+| Top Employees | Aggregated trip data | Real-time |
+| Top Vehicles | Usage tracking | Real-time |
+| Mileage | Trip completion records | On trip end |
+| Fuel Consumption | Fuel log entries | On refuel |
+
+## Mobile View
+
+The dashboard is fully responsive and adapts to smaller screens:
+
+- KPI cards stack vertically on mobile devices
+- Charts remain interactive with touch gestures
+- Tables scroll horizontally to show all data
+- Refresh button remains accessible
+
+<Tip>
+  For the best mobile experience, use the dashboard in landscape orientation when viewing charts.
+</Tip>
+
+## Keyboard Shortcuts
+
+- `R` or `F5`: Refresh dashboard data
+- `Ctrl/Cmd + P`: Print dashboard view
+
+## Related Features
+
+- [Vehicle Operations](vehicle-operations): Manage check-outs and check-ins
+- [Reports](reports): Generate detailed analytics
+- [Notifications](notifications): Configure alerts for metrics
+
+## Technical Details
+
+The dashboard component is located at:
+- Source: `src/pages/Dashboard/Dashboard.jsx`
+- Services: Multiple API endpoints aggregated
+
+Key services used:
+- `getTotalEmpleados()`: Employee count
+- `getTotalVehiculos()`: Vehicle count
+- `getVehiculosEnUso()`: Active vehicles
+- `fetchDashboardData('registros_hoy')`: Today's activity
+- `getEmpleadosMasSalidasReport()`: Top employees
+- `getVehiculosMasUtilizadosReport()`: Top vehicles
+- `getKilometrajePorEmpleadoReport()`: Mileage data
+- `getConsumoCombustibleVehiculoReport()`: Fuel consumption
+
+<Info>
+  All data requests run in parallel for optimal performance, typically loading in under 2 seconds on standard connections.
+</Info>
