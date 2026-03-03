@@ -464,16 +464,121 @@ const filtered = useMemo(() => {
 
 Filtering recalculates only when `cities` or `search` changes.
 
-## Future Features
+## Parkings Management
 
-### Parkings Management
+AutoLog includes a complete parking facility management system for tracking vehicle parking locations.
 
-Planned parking facility management will include:
-- GPS coordinates
-- Capacity information
-- Operating hours
-- Contact details
-- Association with cities
+### Overview
+
+The Parkings feature (`/parkings`) allows you to:
+- Create and manage parking location records
+- Associate parking spots with cities
+- Track available parking facilities
+- Filter and search parking locations
+- Assign vehicles to specific parking spots
+
+### Data Structure
+
+Each parking record includes:
+
+```javascript
+{
+  id_ubicacion: 5,
+  nombre_ubicacion: "Main Office Parking - Building A",
+  id_ciudad: 3,
+  ciudad: "San Pedro Sula",  // Auto-populated from city relationship
+  nombre_ciudad: "San Pedro Sula"
+}
+```
+
+### Creating a Parking Location
+
+<Steps>
+  <Step title="Navigate to Parkings">
+    Go to **Administration** → **Parkings** (`/parkings`)
+  </Step>
+  
+  <Step title="Click Create">
+    Click the **+ Add Parking** button (requires `crear_estacionamiento` permission)
+  </Step>
+  
+  <Step title="Fill Details">
+    Enter the parking information:
+    - **Location Name** (nombre_ubicacion): Descriptive name (min 2 characters, required)
+    - **City** (id_ciudad): Select from configured cities (required)
+  </Step>
+  
+  <Step title="Submit">
+    Click **Save** to create the parking location
+  </Step>
+</Steps>
+
+### Permissions
+
+| Action | Permission | Description |
+|--------|-----------|-------------|
+| View parkings | `ver_estacionamientos` | View parking list |
+| Create parking | `crear_estacionamiento` | Add new parking locations |
+| Edit parking | `editar_estacionamiento` | Modify existing parkings |
+| Delete parking | `eliminar_estacionamiento` | Remove parking locations |
+
+### Search and Filter
+
+The parkings list supports real-time search:
+- Search by parking name
+- Search by city name
+- Case-insensitive matching
+
+```javascript
+// Example: Filtering parkings
+const filtered = parkings.filter((p) => {
+  const name = (p.nombre_ubicacion || "").toLowerCase();
+  const cityName = (p.ciudad || p.nombre_ciudad || "").toLowerCase();
+  return name.includes(searchTerm) || cityName.includes(searchTerm);
+});
+```
+
+### API Services
+
+From `ParkingServices.jsx`:
+
+**getParkings()**
+- Returns: Array of parking objects
+- Endpoint: `endpoints.getParkings`
+
+**addParking(parking)**
+- Parameters: `{ nombre_ubicacion, id_ciudad }`
+- Returns: Created parking object
+
+**updateParking(id, parking)**
+- Parameters: Parking ID and updated data
+- Returns: Updated parking object
+
+**deleteParking(id)**
+- Parameters: Parking ID
+- Returns: Success confirmation
+
+### Validation Rules
+
+From the Yup schema:
+
+```javascript
+{
+  nombre_ubicacion: yup.string()
+    .transform((v) => typeof v === "string" ? v.trim() : v)
+    .min(2, "Minimum 2 characters")
+    .required("Required"),
+  id_ciudad: yup.string()
+    .required("Must select a city")
+}
+```
+
+### Integration with Vehicles
+
+Parkings can be assigned to vehicles through the `id_ubicacion_actual` field, enabling:
+- Current vehicle location tracking
+- Parking utilization reports
+- Location-based vehicle searches
 
 ## Related Pages
 
